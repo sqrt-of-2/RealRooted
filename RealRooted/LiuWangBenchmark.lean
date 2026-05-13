@@ -1,4 +1,4 @@
-/- 
+/-
 # A Liu--Wang benchmark family
 
 For a fixed parameter `d : ℕ`, define
@@ -879,8 +879,7 @@ lemma interlaces_liuWangRec_threshold_succ (d : Nat) :
 
 private lemma prec_of_interlaces_X_mul_of_roots_nonpos {f g : ℝ[X]}
     (h : Interlaces g (X * f))
-    (hf_nonpos : ∀ r ∈ f.roots, r ≤ 0)
-    (hg_nonpos : ∀ r ∈ g.roots, r ≤ 0) :
+    (hf_nonpos : ∀ r ∈ f.roots, r ≤ 0) :
     Prec f g := by
   obtain ⟨hXf, hg, _, rs_xf, ss_g, hrs_xf, hss_g, hrs_xf_eq, hss_g_eq, hint⟩ := h
   have hf : IsRealRooted f := isRealRooted_of_X_mul hXf
@@ -958,7 +957,7 @@ private lemma prec_threshold_divX (d : Nat) :
     intro r hr
     exact le_of_lt (roots_neg_liuWangRec_of_lt_threshold d (d + 1) (by omega) (by omega) r
       ((mem_roots (liuWangRec_ne_zero d (d + 1) (by omega))).mp hr))
-  simpa [q] using prec_of_interlaces_X_mul_of_roots_nonpos hInter hq_nonpos hg_nonpos
+  simpa [q] using prec_of_interlaces_X_mul_of_roots_nonpos hInter hq_nonpos
 
 private lemma roots_neg_threshold_divX (d : Nat) :
     ∀ r, (((liuWangRec d (d + 2)) /ₘ X)).IsRoot r → r < 0 := by
