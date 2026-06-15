@@ -36,149 +36,21 @@ The primary theorem for this file is the strict `PosDef` version.
 
 -/
 
-open Polynomial Matrix
+open Polynomial Matrix List
 
 noncomputable section
 
 namespace RealRooted
 
-private lemma interleave_append_singleton {α : Type*} (l₁ l₂ : List α) (s r : α)
-    (h : l₁.length = l₂.length) :
-    (l₁ ++ [s]).interleave (l₂ ++ [r]) = (l₁.interleave l₂) ++ [r, s] := by
-  induction l₁ generalizing l₂ with
-  | nil => rcases l₂ with _ | ⟨b, l₂⟩ <;> simp_all
-  | cons a l₁ ih => rcases l₂ with _ | ⟨b, l₂⟩ <;> simp_all
-
-private lemma interleave_append_singleton_left {α : Type*} (l₁ l₂ : List α) (s r : α)
-    (h : l₁.length + 1 = l₂.length) :
-    (l₁ ++ [s]).interleave (l₂ ++ [r]) = (l₁.interleave l₂) ++ [s, r] := by
-  induction l₁ generalizing l₂ with
-  | nil => rcases l₂ with _ | ⟨b, _ | ⟨c, l₂⟩⟩ <;> simp_all
-  | cons a l₁ ih => rcases l₂ with _ | ⟨b, l₂⟩ <;> simp_all
-
-private lemma interleave_append_singleton_right {α : Type*} (l₁ l₂ : List α) (r : α)
-    (h : l₁.length = l₂.length) :
-    l₁.interleave (l₂ ++ [r]) = (l₁.interleave l₂) ++ [r] := by
-  induction l₁ generalizing l₂ with
-  | nil => rcases l₂ with _ | ⟨b, l₂⟩ <;> simp_all
-  | cons a l₁ ih => rcases l₂ with _ | ⟨b, l₂⟩ <;> simp_all
-
-private lemma interleaves_cons_reverse {ss rs : List ℝ} {s r : ℝ} (h : ss.length = rs.length) :
-    List.Interleaves (· > ·) (s :: ss).reverse (r :: rs).reverse ↔
-      s < r ∧ List.Interleaves (· > ·) ss.reverse (r :: rs).reverse := by
-  rw [List.interleaves_iff_length_isChain_interleave,
-    List.interleaves_iff_length_isChain_interleave]
-  simp only [List.reverse_cons]
-  rw [interleave_append_singleton _ _ _ _ (by simp [h]),
-      interleave_append_singleton_right _ _ _ (by simp [h])]
-  grind
-
-private lemma interleaves_cons_reverse_left {ss rs : List ℝ} {s r₁ r₂ : ℝ}
-    (h : ss.length + 1 = (r₂ :: rs).length) :
-    List.Interleaves (· > ·) (s :: ss).reverse (r₁ :: r₂ :: rs).reverse ↔
-      r₁ < s ∧ s < r₂ ∧ List.Interleaves (· > ·) ss.reverse (r₂ :: rs).reverse := by
-  have h_eq : ss.length = rs.length := by simp_all
-  clear h
-  rw [List.interleaves_iff_length_isChain_interleave,
-    List.interleaves_iff_length_isChain_interleave]
-  simp only [List.reverse_cons, List.length_reverse, List.length_cons, List.length_append]
-  rw [interleave_append_singleton_left _ _ _ _ (by simp [h_eq]),
-      interleave_append_singleton_right _ _ _ (by simp [h_eq]),
-      List.isChain_append]
-  grind
-
-private lemma interleaves_reverse_of_interlaced_left :
-    ∀ {ss rs : List ℝ} (h : ss.length + 1 = rs.length)
-      (hint : ∀ (i : Fin ss.length) (j : Fin rs.length), i.1 + 1 = j.1 → ss[i.1] < rs[j.1])
-      (hint' : ∀ (i : Fin rs.length) (j : Fin ss.length), i.1 < j.1 + 1 → rs[i.1] < ss[j.1]),
-      List.Interleaves (· > ·) ss.reverse rs.reverse := by
-  intro ss
-  induction ss with
-  | nil =>
-    intro rs h _ _
-    rcases rs with _ | ⟨r, _ | ⟨r₂, rs⟩⟩
-    · simp
-    · simp
-    · simp at h
-  | cons s ss ih =>
-    intro rs h hint hint'
-    rcases rs with _ | ⟨r₁, _ | ⟨r₂, rs⟩⟩
-    · simp at h
-    · simp at h
-    · have h_len : ss.length + 1 = (r₂ :: rs).length := by
-        simp only [List.length_cons] at h ⊢
-        lia
-      rw [interleaves_cons_reverse_left h_len]
-      refine ⟨hint' ⟨0, by simp⟩ ⟨0, by simp⟩ (by simp),
-              hint ⟨0, by simp⟩ ⟨1, by simp⟩ (by simp),
-              ih h_len ?_ ?_⟩
-      · intro i j hij
-        have := hint ⟨i.1 + 1, by simp⟩
-          ⟨j.1 + 1, by rw [List.length_cons (a := r₁)]; lia⟩ (by lia)
-        rwa [List.getElem_cons_succ, List.getElem_cons_succ] at this
-      · intro i j hij
-        have := hint' ⟨i.1 + 1, by rw [List.length_cons (a := r₁)]; lia⟩
-          ⟨j.1 + 1, by simp⟩ (by lia)
-        simp_all
-
-private lemma interleaves_reverse_of_interlaced :
-    ∀ {ss rs : List ℝ} (h : ss.length = rs.length)
-      (hint : ∀ (k : Fin ss.length), ss[k.1] < rs[k.1])
-      (hint' : ∀ (i j : Fin ss.length), i.1 < j.1 → rs[i.1] < ss[j.1]),
-      List.Interleaves (· > ·) ss.reverse rs.reverse := by
-  intro ss
-  induction ss with
-  | nil =>
-    intro rs h _ _
-    rcases rs with _ | ⟨r, rs⟩
-    · simp
-    · simp at h
-  | cons s ss ih =>
-    intro rs h hint hint'
-    rcases rs with _ | ⟨r, rs⟩
-    · simp at h
-    · have h_len : ss.length = rs.length := by
-        simp only [List.length_cons] at h ⊢
-        lia
-      rw [interleaves_cons_reverse h_len]
-      refine ⟨hint ⟨0, by simp⟩,
-              interleaves_reverse_of_interlaced_left (by simp [h_len]) ?_ ?_⟩
-      · intro i j hij
-        rcases i with ⟨i_val, hi⟩
-        rcases j with ⟨_ | j_val, hj⟩
-        · lia
-        · have h_eq : i_val = j_val := by lia
-          subst h_eq
-          have := hint ⟨i_val + 1, by lia⟩
-          simp_all
-      · intro i j hij
-        rcases i with ⟨_ | i_val, hi⟩
-        · rcases j with ⟨j_val, hj⟩
-          exact hint' ⟨0, h.symm ▸ hi⟩
-            ⟨j_val + 1, by rw [List.length_cons]; lia⟩ (by lia)
-        · rcases j with ⟨j_val, hj⟩
-          exact hint' ⟨i_val + 1, h.symm ▸ hi⟩
-            ⟨j_val + 1, by rw [List.length_cons]; lia⟩ hij
-
-private lemma List.Interleaves.ofFn {n : ℕ}
-    (s r : Fin n → ℝ) (_hs : StrictMono s) (_hr : StrictMono r)
-    (hint : ∀ k : Fin n, s k < r k)
-    (hint' : ∀ (i j : Fin n), i < j → r i < s j) :
-    List.Interleaves (· > ·) (List.ofFn s).reverse (List.ofFn r).reverse := by
-  have h_len : (List.ofFn s).length = (List.ofFn r).length := by simp
-  refine interleaves_reverse_of_interlaced h_len ?_ ?_ <;> simp_all
-
-private lemma interlaced_of_interleaves_reverse_left :
-    ∀ {ss rs : List ℝ} (h : ss.length + 1 = rs.length)
-      (_h_inter : List.Interleaves (· > ·) ss.reverse rs.reverse),
-      (∀ (i : Fin ss.length) (j : Fin rs.length), i.1 + 1 = j.1 → ss[i.1] < rs[j.1]) ∧
-      (∀ (i : Fin rs.length) (j : Fin ss.length), i.1 < j.1 + 1 → rs[i.1] < ss[j.1]) := by
-  intro ss
-  induction ss with
+private lemma interlaced_of_interleaves_reverse_left {ss rs : List ℝ}
+    (h : ss.length + 1 = rs.length)
+    (h_inter : List.Interleaves (· > ·) ss.reverse rs.reverse) :
+    (∀ (i : Fin ss.length) (j : Fin rs.length), i.1 + 1 = j.1 → ss[i.1] < rs[j.1]) ∧
+    (∀ (i : Fin rs.length) (j : Fin ss.length), i.1 < j.1 + 1 → rs[i.1] < ss[j.1]) := by
+  induction ss generalizing rs with
   | nil =>
     simp
   | cons s ss ih =>
-    intro rs h h_inter
     rcases rs with _ | ⟨r₁, _ | ⟨r₂, rs⟩⟩
     · simp
     · simp at h
@@ -209,21 +81,17 @@ private lemma interlaced_of_interleaves_reverse_left :
               ⟨j_val, by grind⟩ (by lia)
             simp_all
 
-private lemma interlaced_of_interleaves_reverse :
-    ∀ {ss rs : List ℝ} (h : ss.length = rs.length)
-      (_h_inter : List.Interleaves (· > ·) ss.reverse rs.reverse),
-      (∀ (k : Fin ss.length), ss[k.1] < rs[k.1]) ∧
-      (∀ (i j : Fin ss.length), i.1 < j.1 → rs[i.1] < ss[j.1]) := by
-  intro ss
-  induction ss with
+private lemma interlaced_of_interleaves_reverse {ss rs : List ℝ} (h : ss.length = rs.length)
+    (h_inter : List.Interleaves (· > ·) ss.reverse rs.reverse) :
+    (∀ (k : Fin ss.length), ss[k.1] < rs[k.1]) ∧
+    (∀ (i j : Fin ss.length), i.1 < j.1 → rs[i.1] < ss[j.1]) := by
+  induction ss generalizing rs with
   | nil =>
     simp
   | cons s ss ih =>
-    intro rs h h_inter
     rcases rs with _ | ⟨r, rs⟩
     · simp at h
-    · have h_len : ss.length = rs.length := by
-        simp_all
+    · have h_len : ss.length = rs.length := by simp_all
       rw [interleaves_cons_reverse h_len] at h_inter
       obtain ⟨hsr, h_inter_tail⟩ := h_inter
       have h_tail := interlaced_of_interleaves_reverse_left
@@ -1288,7 +1156,7 @@ lemma StrictPrecSameDegree.of_fin_interlacing {n : ℕ}
   exact ⟨⟨hp_ne, hp_splits⟩, ⟨hq_ne, hq_splits⟩, hp_deg ▸ hq_deg ▸ rfl,
     Polynomial.roots_sort_eq_ofFn hp_ne hp_splits hp_deg hp_roots_nodup s hs hs_surj ▸
     Polynomial.roots_sort_eq_ofFn hq_ne hq_splits hq_deg hq_roots_nodup r hr hr_surj ▸
-    List.Interleaves.ofFn s r hs hr hint hint'⟩
+    List.Interleaves.ofFn s r hint hint'⟩
 
 lemma Polynomial.has_root_between_roots_of_wronskian_pos {n : ℕ}
     {p q : ℝ[X]} (hp_pos : HasPosLeadingCoeff p) (hq_pos : HasPosLeadingCoeff q)
