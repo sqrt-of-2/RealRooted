@@ -115,7 +115,7 @@ lemma left_sublist_interleave : ∀ {l₁ l₂ : List α}, l₁.length ≤ l₂.
   | [], _, _ => by simp
   | a :: l₁, b :: l₂, h => by
     simp only [interleave_cons]
-    exact .cons _ <| .cons_cons _ <| left_sublist_interleave <| by simpa using h
+    exact .cons _ <| .cons_cons _ <| left_sublist_interleave <| by grind
 
 @[simp]
 lemma right_sublist_interleave {l₁ l₂ : List α} (hl : l₂.length ≤ l₁.length + 1) :
@@ -219,7 +219,7 @@ lemma interleaves_ofFn' {n : ℕ} {f : Fin n → α} {g : Fin (n + 1) → α} :
   -- FIXME: Why doesn't `grind unfold these?
   unfold Fin.castSucc Fin.castAdd Fin.castLE
   refine ⟨fun h ↦ ?_, fun h i hi ↦ by
-    have := h.1 ⟨i / 2, by lia⟩; have := h.2 ⟨i / 2, by lia⟩; grind⟩
+    grind⟩
   exact ⟨fun i ↦ by have := h (2 * i + 1); grind, fun i ↦ by have := h (2 * i); grind⟩
 
 variable [IsTrans α r]

@@ -81,9 +81,7 @@ lemma isRealRooted_of_dvd {p q : ℝ[X]} (hp_ne : p ≠ 0) (hp_splits : p.Splits
 
 lemma isRealRooted_of_X_mul {f : ℝ[X]}
     (hXf_ne : (X * f) ≠ 0) (hXf_splits : (X * f).Splits) :
-    f ≠ 0 ∧ f.Splits := by
-  have hf0 : f ≠ 0 := right_ne_zero_of_mul hXf_ne
-  exact isRealRooted_of_dvd hXf_ne hXf_splits hf0 ⟨X, by ring⟩
+    f ≠ 0 ∧ f.Splits := by simp_all
 
 /-- A root of a divisor is a root of the dividend. -/
 lemma IsRoot.of_dvd {p q : ℝ[X]} (hpq : p ∣ q) {x : ℝ} (hx : p.IsRoot x) :
@@ -381,7 +379,6 @@ lemma add_ne_zero_of_same_natDegree_of_posLeadingCoeff {p q : ℝ[X]}
     p + q ≠ 0 := by
   intro hpq
   have hsum_pos := hasPosLeadingCoeff_add_of_same_natDegree hdeg hp_pos hq_pos
-  unfold HasPosLeadingCoeff at hsum_pos
-  simp [hpq] at hsum_pos
+  simp_all
 
 end RealRooted

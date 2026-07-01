@@ -195,7 +195,7 @@ theorem exists_real_root_near_in_left_family
   obtain ⟨b, hb_qroot, hb_dist⟩ :=
     exists_roots_norm_sub_lt_of_norm_coeff_sub_lt
       (f := f) (g := q) (a := a) (ε := ε) hε ha hf_monic hq_monic hq_deg
-      (norm_coeff_sub_normalized_left_family_lt f g ht hcoeff_bound) (by simp_all [q])
+      (norm_coeff_sub_normalized_left_family_lt f g ht hcoeff_bound) (by simp_all)
   have hb_sum_mem : b ∈ (C t * f + g).roots := by
     simpa [q, roots_C_mul _ (inv_ne_zero ht1_ne)] using hb_qroot
   have hb_sum_root : (C t * f + g).IsRoot b := (Polynomial.mem_roots hrr_ne).mp hb_sum_mem

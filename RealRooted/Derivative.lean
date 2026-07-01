@@ -387,7 +387,7 @@ theorem derivative_interlaces {f : ℝ[X]} (hf : f.Splits) (hdeg : 2 ≤ f.natDe
   have hss_sorted : ss.Pairwise (· ≤ ·) :=
     sorted_of_listInterlaces ss rs hrs_sorted hss_interlaces
   -- Assemble
-  exact ⟨⟨by rintro rfl; simp at hf'_ne, hf⟩, hf'_rr, by grind [f.natDegree_derivative],
+  exact ⟨⟨by grind, hf⟩, hf'_rr, by grind [f.natDegree_derivative],
     rs, ss, hrs_sorted, hss_sorted, hrs_multiset, hss_eq, hss_interlaces⟩
 
 /-- Splitting is preserved by differentiation in the zero-aware convention. -/
@@ -397,16 +397,13 @@ theorem eq_zero_or_splits_derivative {p : ℝ[X]}
   rcases hp with rfl | hp
   · simp
   by_cases hp0 : p = 0
-  · subst p
-    simp
+  · simp_all
   by_cases hdeg0 : p.natDegree = 0
-  · have hder0 : p.derivative = 0 := Polynomial.derivative_eq_zero.mpr hdeg0
-    rw [hder0]
-    exact Or.inl rfl
+  · simp_all
   by_cases hdeg1 : p.natDegree = 1
   · right
     apply Polynomial.Splits.of_natDegree_eq_zero
-    rw [p.natDegree_derivative, hdeg1]
+    simp_all
   · have hdeg2 : 2 ≤ p.natDegree := by grind
     exact Or.inr (derivative_interlaces hp hdeg2).2.1.2
 
@@ -416,15 +413,13 @@ theorem derivative_eq_zero_or_ne_zero_and_splits {p : ℝ[X]}
     (hp_splits : p.Splits) :
     p.derivative = 0 ∨ (p.derivative ≠ 0 ∧ p.derivative.Splits) := by
   by_cases hdeg0 : p.natDegree = 0
-  · left
-    exact Polynomial.derivative_eq_zero.mpr hdeg0
+  · simp_all
   by_cases hdeg1 : p.natDegree = 1
-  · right
-    have hder_ne : p.derivative ≠ 0 := Polynomial.derivative_ne_zero.mpr hdeg0
-    have hder_splits : p.derivative.Splits := by
+  · have hder_ne : p.derivative ≠ 0 := Polynomial.derivative_ne_zero.mpr hdeg0
+    have : p.derivative.Splits := by
       apply Polynomial.Splits.of_natDegree_eq_zero
-      rw [p.natDegree_derivative, hdeg1]
-    exact ⟨hder_ne, hder_splits⟩
+      simp_all
+    simp_all
   · have hdeg2 : 2 ≤ p.natDegree := by grind
     exact Or.inr (derivative_interlaces hp_splits hdeg2).2.1
 
@@ -435,18 +430,13 @@ theorem roots_nonpos_derivative_of_roots_nonpos {p : ℝ[X]}
     (hroots : ∀ r ∈ p.roots, r ≤ 0) :
     ∀ r ∈ p.derivative.roots, r ≤ 0 := by
   by_cases hdeg0 : p.natDegree = 0
-  · have hder0 : p.derivative = 0 := Polynomial.derivative_eq_zero.mpr hdeg0
-    rw [hder0]
-    intro r hr
-    simp at hr
+  · simp_all
   by_cases hdeg1 : p.natDegree = 1
-  · have hderdeg : p.derivative.natDegree = 0 := by
-      rw [p.natDegree_derivative, hdeg1]
+  · have hderdeg : p.derivative.natDegree = 0 := by simp_all
     have hderC : p.derivative = C (p.derivative.coeff 0) :=
       eq_C_of_natDegree_eq_zero hderdeg
     rw [hderC]
-    intro r hr
-    simp at hr
+    simp
   · have hdeg2 : 2 ≤ p.natDegree := by grind
     exact roots_le_of_prec_right (derivative_interlaces hp_splits hdeg2).toPrec hroots
 

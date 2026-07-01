@@ -145,9 +145,9 @@ private lemma interlaced_of_interleaves_reverse_left :
   have h_len : ss.length + 1 = (r₂ :: rs).length := by simp_all
   rw [List.reverse_cons, List.reverse_cons, List.reverse_cons,
     List.interleaves_append_singleton_append_singleton_of_length_add_one_eq_length
-      (by simpa using h_len),
+      (by grind),
     List.interleaves_append_singleton_append_singleton_of_length_eq_length
-      (by simpa using h_len), ← List.reverse_cons] at h_inter
+      (by grind), ← List.reverse_cons] at h_inter
   obtain ⟨hr1s, hsr2, h_inter_tail⟩ := h_inter
   have h_tail := ih h_len h_inter_tail
   constructor
@@ -189,7 +189,7 @@ private lemma interlaced_of_interleaves_reverse :
   have h_len : ss.length = rs.length := by simp_all
   rw [List.reverse_cons, List.reverse_cons,
     List.interleaves_append_singleton_append_singleton_of_length_eq_length
-      (by simpa using h_len), ← List.reverse_cons] at h_inter
+      (by grind), ← List.reverse_cons] at h_inter
   obtain ⟨hsr, h_inter_tail⟩ := h_inter
   have h_tail := interlaced_of_interleaves_reverse_left
     (by simp_all) h_inter_tail
@@ -1075,8 +1075,7 @@ lemma bezoutMatrix.no_complex_root_of_posDef {n : ℕ}
           linarith
         have hsum := (mul_eq_zero.mp h_bezoutian).resolve_left hdiff_ne
         simpa only [bezoutMatrix, map_pow] using hsum⟩
-    refine ⟨fun i ↦ (y i).re, ?_, ?_⟩
-    all_goals
+    refine ⟨fun i ↦ (y i).re, ?_, ?_⟩ <;>
       simp_all only [Complex.ext_iff, Complex.zero_re, Complex.zero_im, ne_eq,
         Complex.re_sum, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul,
         sub_zero, Complex.conj_re, Complex.mul_im, add_zero, Complex.conj_im, mul_neg,

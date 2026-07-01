@@ -85,15 +85,14 @@ lemma TDeriv_eq_zero_iff (eps : ℝ) {p : ℝ[X]} :
   constructor
   · intro hT
     by_cases hp0 : p = 0
-    · exact hp0
+    · simp_all
     · by_cases hdeg0 : p.natDegree = 0
       · have hconst : TDeriv eps p = p := by
           rw [eq_C_of_natDegree_eq_zero hdeg0, TDeriv, derivative_C]
           simp
-        exact hconst.symm.trans hT
+        simp_all
       · cases TDeriv_ne_zero hp0 hT
-  · intro hp0
-    simp [hp0, TDeriv]
+  · simp_all
 
 lemma TDeriv_injective (eps : ℝ) : Function.Injective (TDeriv eps) := by
   intro p q hpq
@@ -137,7 +136,6 @@ lemma hasSimpleRoots_tderiv
       have hcoeff0 : p.coeff 0 = 0 := by
         rw [hp_eq, Polynomial.IsRoot.def, eval_C] at hp_root
         lia
-      have := hsimple.ne_zero
       grind
     · lia
   have hp_not_root : ¬ p.IsRoot a := by

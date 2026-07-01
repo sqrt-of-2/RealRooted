@@ -607,7 +607,7 @@ private lemma isRealRooted_pair_of_affine_family_succDegree
   have hXf_rr : ((X * f) ≠ 0 ∧ (X * f).Splits) :=
     PosComboRealRooted.isRealRooted_right_of_sameDegree
       hcombo hsum_pos hXf_pos hdeg_same
-  exact ⟨hsum_rr, isRealRooted_of_X_mul hXf_rr.1 hXf_rr.2⟩
+  simp_all
 
 private lemma isRealRooted_right_of_affine_family_succDegree
     {f g : ℝ[X]}
@@ -1444,9 +1444,7 @@ private lemma right_pair_root_zero_reduction_data
       ring
     have hrr : ((X * (C lam * qg + C μ * f)) ≠ 0 ∧ (X * (C lam * qg + C μ * f)).Splits) := by
       simpa [hEq] using hX_pair hlam hμ
-    have hcombo_ne : C lam * qg + C μ * f ≠ 0 := by
-      grind
-    exact isRealRooted_of_dvd hrr.1 hrr.2 hcombo_ne ⟨X, by grind⟩
+    simp_all
   have hdeg_right : g.natDegree ≤ f.natDegree + 1 :=
     natDegree_right_le_succ_of_affine_family hf0 hg0 hfnn hgnn haff
   have hdeg_q_lo : qg.natDegree ≤ f.natDegree := by
@@ -3239,11 +3237,7 @@ private lemma exists_f_root_between_consecutive_g_roots_of_affine_family_succDeg
     have hroot : g.IsRoot m := by
       simpa [Polynomial.IsRoot.def] using hgm
     exact hno_between_g m ((mem_roots hg0).mpr hroot) hm_mem
-  have hf_mid_ne : f.eval m ≠ 0 := by
-    intro hfm
-    have hroot : f.IsRoot m := by
-      simpa [Polynomial.IsRoot.def] using hfm
-    grind
+  have hf_mid_ne : f.eval m ≠ 0 := by simp_all
   by_cases hmid_opp : g.eval m * f.eval m < 0
   · have hfamily_f :
         ∀ {t : ℝ}, 0 < t → ((C t * f + g) ≠ 0 ∧ (C t * f + g).Splits) := by

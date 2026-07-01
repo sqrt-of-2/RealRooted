@@ -231,7 +231,7 @@ theorem veronesePairLace_even {a b : ℕ → ℝ} {r k n c : ℕ} (hk : k < r) :
       toeplitz (veroneseSectionSeq r k a) n c := by
   have hmod : 2 * (k + r * n) % 2 = 0 := Nat.mul_mod_right 2 (k + r * n)
   have hdiv : 2 * (k + r * n) / 2 = k + r * n :=
-    Nat.mul_div_right (k + r * n) (by lia)
+    Nat.mul_div_right (k + r * n) (by simp [*])
   dsimp [veronesePairLace, lacePair]
   rw [if_pos hmod, hdiv]
   dsimp [toeplitz, veroneseSectionSeq]
@@ -250,15 +250,14 @@ theorem veronesePairLace_even {a b : ℕ → ℝ} {r k n c : ℕ} (hk : k < r) :
       have hsucc : n + 1 ≤ c := Nat.succ_le_of_lt hlt
       have hmul : r * (n + 1) ≤ r * c := Nat.mul_le_mul_left r hsucc
       lia
-    lia
+    simp [*]
 
 /-- Odd rows of `veronesePairLace` are Toeplitz rows for the sections of
 the second sequence. -/
 theorem veronesePairLace_odd {a b : ℕ → ℝ} {r k n c : ℕ} (hk : k < r) :
     veronesePairLace r a b (2 * (k + r * n) + 1) c =
       toeplitz (veroneseSectionSeq r k b) n c := by
-  have hmod_ne : ¬ (2 * (k + r * n) + 1) % 2 = 0 := by
-    lia
+  have hmod_ne : ¬ (2 * (k + r * n) + 1) % 2 = 0 := by simp [*]
   have hdiv : (2 * (k + r * n) + 1) / 2 = k + r * n := by
     lia
   dsimp [veronesePairLace, lacePair]
@@ -279,7 +278,7 @@ theorem veronesePairLace_odd {a b : ℕ → ℝ} {r k n c : ℕ} (hk : k < r) :
       have hsucc : n + 1 ≤ c := Nat.succ_le_of_lt hlt
       have hmul : r * (n + 1) ≤ r * c := Nat.mul_le_mul_left r hsucc
       lia
-    lia
+    simp [*]
 
 /-- The first row family of a fully interlacing pair is a Pólya-frequency
 sequence. -/
@@ -287,10 +286,10 @@ theorem FullyInterlacingPair.left_pf {a b : ℕ → ℝ}
     (h : FullyInterlacingPair a b) :
     IsPolyaFreqSeq a := by
   intro n rows cols hrows hcols
-  let rows' : Fin n → ℕ := fun i => 2 * rows i
+  let rows' : Fin n → ℕ := fun i ↦ 2 * rows i
   have hrows' : StrictMono rows' := by
     intro i j hij
-    exact Nat.mul_lt_mul_of_pos_left (hrows hij) (by lia)
+    exact Nat.mul_lt_mul_of_pos_left (hrows hij) (by simp [*])
   have hminor : (toeplitz a).submatrix rows cols = submatrix (lacePair a b) rows' cols := by
     ext i j
     simp [submatrix, rows', lacePair]
@@ -306,7 +305,7 @@ theorem FullyInterlacingPair.right_pf {a b : ℕ → ℝ} (h : FullyInterlacingP
   have hrows' : StrictMono rows' := by
     intro i j hij
     exact Nat.add_lt_add_right
-      (Nat.mul_lt_mul_of_pos_left (hrows hij) (by lia)) 1
+      (Nat.mul_lt_mul_of_pos_left (hrows hij) (by simp [*])) 1
   have hminor : (toeplitz b).submatrix rows cols = submatrix (lacePair a b) rows' cols := by
     ext i j
     have hdiv : (2 * rows i + 1) / 2 = rows i := by
@@ -325,9 +324,7 @@ theorem strictMono_veronesePairSectionRowMap {r k : ℕ} (hr : 0 < r) :
   intro m n hmn
   unfold veronesePairSectionRowMap
   by_cases hq : m / 2 = n / 2
-  · rw [hq]
-    gcongr
-    lia
+  · grind
   · have hqle : m / 2 ≤ n / 2 := Nat.div_le_div_right (le_of_lt hmn)
     have hqlt : m / 2 < n / 2 := lt_of_le_of_ne hqle hq
     have hqsucc : m / 2 + 1 ≤ n / 2 := Nat.succ_le_of_lt hqlt
@@ -345,8 +342,7 @@ theorem lacePair_veroneseSectionSeq {a b : ℕ → ℝ} {r k row col : ℕ}
   · rw [if_pos heven]
     have hrowmap :
         2 * (k + r * (row / 2)) + row % 2 =
-          2 * (k + r * (row / 2)) := by
-      lia
+          2 * (k + r * (row / 2)) := by simp [*]
     rw [hrowmap]
     exact (veronesePairLace_even (a := a) (b := b) (r := r) (k := k)
       (n := row / 2) (c := col) hk).symm
@@ -912,10 +908,7 @@ theorem isUpperHalfPlaneStable_iff_isRightHalfPlaneStable_comp (P : ℂ[X]) :
     rw [Polynomial.eval_comp]
     simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_X]
     apply h
-    have him : (Complex.I * z).im = z.re := by
-      simp [Complex.mul_im]
-    rw [him]
-    exact hz
+    simp_all
   · intro h w hw
     have key : P.eval w = (P.comp (C Complex.I * X)).eval (-Complex.I * w) := by
       rw [Polynomial.eval_comp]
@@ -924,10 +917,7 @@ theorem isUpperHalfPlaneStable_iff_isRightHalfPlaneStable_comp (P : ℂ[X]) :
       simp [Complex.I_sq]
     rw [key]
     apply h
-    have hre : (-Complex.I * w).re = w.im := by
-      simp [Complex.mul_re]
-    rw [hre]
-    exact hw
+    simp_all
 
 /-- Minimal conformal-substitution interface for the converse Hurwitz/
 Hermite--Biehler bridge.
@@ -1062,7 +1052,7 @@ theorem Prec.natDegree_le {f g : ℝ[X]} (h : Prec f g) :
     rw [← Multiset.coe_card, hss_eq, card_roots_of_splits hfs]
   have hrs_len : rs.length = g.natDegree := by
     rw [← Multiset.coe_card, hrs_eq, card_roots_of_splits hgs]
-  rcases hshape with ⟨hlen, _⟩ | ⟨hlen, _⟩ <;> lia
+  grind
 
 /-- Elementary orientation resolution by degree.  A disjunctive proper-position
 conclusion `Prec g f ∨ Prec f g` collapses to the oriented branch `Prec g f`
@@ -1072,7 +1062,7 @@ theorem prec_of_or_of_natDegree_lt {f g : ℝ[X]}
     (h : Prec g f ∨ Prec f g) (hgf : g.natDegree < f.natDegree) : Prec g f := by
   rcases h with h | h
   · exact h
-  · exact absurd h.natDegree_le (by lia)
+  · exact absurd h.natDegree_le (by simp [*])
 
 /-- Degree-restricted oriented converse Hermite--Biehler step, *without* any
 orientation-selection input.
@@ -1130,12 +1120,7 @@ theorem hurwitzStableOddEvenToPrec_of_converse_natDegree_lt
 theorem comp_X_sq_ne_zero {p : ℝ[X]} (hp : p ≠ 0) :
     p.comp (X ^ 2 : ℝ[X]) ≠ 0 := by
   rw [Ne, Polynomial.comp_eq_zero_iff]
-  rintro (h | ⟨_, hc⟩)
-  · exact hp h
-  · have hd :
-      (X ^ 2 : ℝ[X]).natDegree = (C ((X ^ 2 : ℝ[X]).coeff 0)).natDegree := by
-      rw [← hc]
-    simp at hd
+  simp_all
 
 /-- The Veronese substitution `X ↦ X²` doubles the degree. -/
 theorem natDegree_comp_X_sq (q : ℝ[X]) :
@@ -1163,11 +1148,10 @@ theorem natDegree_oddEvenPolynomial {p q : ℝ[X]} (hp : p ≠ 0) :
     natDegree_X_mul_comp_X_sq hp
   unfold oddEvenPolynomial
   rcases lt_trichotomy (2 * q.natDegree) (2 * p.natDegree + 1) with h | h | h
-  · rw [Polynomial.natDegree_add_eq_right_of_natDegree_lt (by rw [ha, hb]; exact h), hb,
+  · rw [Polynomial.natDegree_add_eq_right_of_natDegree_lt (by simp_all), hb,
       max_eq_right (by lia)]
-  · exfalso
-    lia
-  · rw [Polynomial.natDegree_add_eq_left_of_natDegree_lt (by rw [ha, hb]; exact h), ha,
+  · grind
+  · rw [Polynomial.natDegree_add_eq_left_of_natDegree_lt (by simp_all), ha,
       max_eq_left (by lia)]
 
 /-- The strict-degree hypothesis used in
@@ -1182,16 +1166,7 @@ theorem natDegree_lt_iff_even_natDegree_oddEvenPolynomial {p q : ℝ[X]}
     (hp : p ≠ 0) :
     p.natDegree < q.natDegree ↔ Even (oddEvenPolynomial p q).natDegree := by
   rw [natDegree_oddEvenPolynomial hp]
-  constructor
-  · intro h
-    rw [max_eq_left (by lia)]
-    exact ⟨q.natDegree, by ring⟩
-  · intro h
-    by_contra hcon
-    have hle := Nat.not_lt.mp hcon
-    rw [max_eq_right (by lia)] at h
-    rcases h with ⟨k, hk⟩
-    lia
+  grind
 
 /-- Existence of a right-half-plane square root.
 
@@ -1202,22 +1177,16 @@ theorem exists_rightHalfPlane_sqrt_of_im_pos {w : ℂ} (hw : 0 < w.im) :
     ∃ z : ℂ, 0 < z.re ∧ z ^ 2 = w := by
   obtain ⟨z₀, hz₀⟩ : ∃ z : ℂ, z ^ 2 = w := by
     obtain ⟨z, hz⟩ := Complex.exists_root (f := X ^ 2 - C w)
-      (by rw [Polynomial.degree_X_pow_sub_C (by norm_num)]; norm_num)
-    have hz' : z ^ 2 - w = 0 := by
-      simpa [Polynomial.IsRoot, eval_sub, eval_pow, eval_X, eval_C] using hz
-    exact ⟨z, sub_eq_zero.mp hz'⟩
+      (by rw [Polynomial.degree_X_pow_sub_C (by simp [*])]; simp [*])
+    have hz' : z ^ 2 - w = 0 := by simp_all
+    grind
   have hre : z₀.re ≠ 0 := by
     intro h0
     have him : (z₀ ^ 2).im = 0 := by simp [pow_two, Complex.mul_im, h0]
-    rw [hz₀] at him
-    linarith
+    simp_all
   rcases lt_or_gt_of_ne hre with h | h
-  · refine ⟨-z₀, ?_, ?_⟩
-    · simp only [Complex.neg_re]
-      linarith
-    · rw [neg_sq]
-      exact hz₀
-  · exact ⟨z₀, h, hz₀⟩
+  · refine ⟨-z₀, ?_, ?_⟩ <;> simp_all
+  · grind
 
 /-- Degenerate (`p = 0`) case of the converse conformal substitution. -/
 theorem isUpperHalfPlaneStable_hermiteBiehler_of_rhp_left_zero
@@ -1226,13 +1195,9 @@ theorem isUpperHalfPlaneStable_hermiteBiehler_of_rhp_left_zero
     IsUpperHalfPlaneStable (hermiteBiehlerPolynomial q 0) := by
   intro z hz
   obtain ⟨w, hwre, hwsq⟩ := exists_rightHalfPlane_sqrt_of_im_pos hz
-  have hc0 : complexify (0 : ℝ[X]) = 0 := by simp [complexify]
+  have hc0 : complexify (0 : ℝ[X]) = 0 := by simp
   have h := hrhp w hwre
-  rw [eval_complexify_oddEvenPolynomial, hc0] at h
-  simp only [Polynomial.eval_zero, mul_zero, add_zero] at h
-  rw [hwsq] at h
-  rw [eval_hermiteBiehlerPolynomial, hc0]
-  simpa using h
+  simp_all
 
 /-- Degenerate (`q = 0`) case of the converse conformal substitution. -/
 theorem isUpperHalfPlaneStable_hermiteBiehler_of_rhp_right_zero
@@ -1241,18 +1206,9 @@ theorem isUpperHalfPlaneStable_hermiteBiehler_of_rhp_right_zero
     IsUpperHalfPlaneStable (hermiteBiehlerPolynomial 0 p) := by
   intro z hz
   obtain ⟨w, hwre, hwsq⟩ := exists_rightHalfPlane_sqrt_of_im_pos hz
-  have hc0 : complexify (0 : ℝ[X]) = 0 := by simp [complexify]
+  have hc0 : complexify (0 : ℝ[X]) = 0 := by simp
   have h := hrhp w hwre
-  rw [eval_complexify_oddEvenPolynomial, hc0] at h
-  simp only [Polynomial.eval_zero, zero_add] at h
-  rw [hwsq] at h
-  rw [eval_hermiteBiehlerPolynomial, hc0]
-  simp only [Polynomial.eval_zero, zero_add]
-  have hp : (complexify p).eval z ≠ 0 := by
-    intro h0
-    apply h
-    rw [h0, mul_zero]
-  exact mul_ne_zero Complex.I_ne_zero hp
+  simp_all
 
 /-- Checked reduction of the rotated converse conformal-substitution interface.
 
@@ -1304,7 +1260,7 @@ theorem fullyInterlacingPairInterlace_of_oddEvenStableToPrec
   intro p q hp hq hfull
   have hstable : IsHurwitzStable (oddEvenPolynomial p q) := hStable hfull
   obtain ⟨_, _, ss, rs, hss, hrs, hss_eq, hrs_eq, hshape⟩ := hPrec hp hq hstable
-  exact ⟨ss, rs, hss, hrs, hss_eq, hrs_eq, hshape⟩
+  grind
 
 /-- Once a two-row Lace certificate is available, fixed Veronese sections
 preserve polynomial interlacing in the zero-aware sense, assuming the
@@ -1772,7 +1728,7 @@ protected theorem IsPolyaFreqSeq.veroneseSectionSeq {a : ℕ → ℝ}
         have hmul : r * (rows i + 1) ≤ r * cols j :=
           Nat.mul_le_mul_left r hsucc
         lia
-      lia
+      simp [*]
   rw [hminor]
   exact ha hrows' hcols'
 
@@ -1785,7 +1741,7 @@ theorem IsPolyaFreqSeq_veroneseSectionPolynomial_coeff {p : ℝ[X]}
     funext n
     simp [veroneseSectionSeq,
       coeff_veroneseSectionPolynomial (r := r) (k := k) (p := p) hr]]
-  exact hseq
+  grind
 
 /-- Conditional real-rootedness of Veronese sections from the forward ASW
 theorem and a PF certificate for the original polynomial. -/

@@ -541,7 +541,7 @@ lemma isInterlacingSeqAndNonneg_reverse_rowPairAffineSeq
   exact
     hasNonnegCoeffs_rowPairAffineSeq
       (row₁ := row₁) (row₂ := row₂)
-      hrow₁_nonneg hrow₂_nonneg hs.le ht.le p (by simpa using hp)
+      hrow₁_nonneg hrow₂_nonneg hs.le ht.le p (by grind)
 
 lemma isInterlacingSeq0Nonneg_reverse_rowPairAffineSeq
     {row₁ row₂ : List ℝ[X]}
@@ -565,7 +565,7 @@ lemma isInterlacingSeq0Nonneg_reverse_rowPairAffineSeq
   exact
     hasNonnegCoeffs_rowPairAffineSeq
       (row₁ := row₁) (row₂ := row₂)
-      hrow₁_nonneg hrow₂_nonneg hs.le ht.le p (by simpa using hp)
+      hrow₁_nonneg hrow₂_nonneg hs.le ht.le p (by grind)
 
 lemma isInterlacingSeqNonneg_reverse_rowPairAffineSeq
     {row₁ row₂ : List ℝ[X]}

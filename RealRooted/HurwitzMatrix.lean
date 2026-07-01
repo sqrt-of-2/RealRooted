@@ -24,12 +24,12 @@ finite-minor statement needed by the existing `VeroneseSection` route.
   simp [hurwitz, hdiv]
 
 theorem hurwitz_coeff_even_row_apply (p : ℝ[X]) (i j : ℕ) :
-    hurwitz (fun k => p.coeff k) (2 * i) j = if j ≤ i then p.coeff (2 * (i - j) + 1) else 0 := by
-  simp [toeplitz, hurwitz_coeff_even_row]
+    hurwitz (fun k ↦ p.coeff k) (2 * i) j = if j ≤ i then p.coeff (2 * (i - j) + 1) else 0 := by
+  simp
 
 theorem hurwitz_coeff_odd_row_apply (p : ℝ[X]) (i j : ℕ) :
-    hurwitz (fun k => p.coeff k) (2 * i + 1) j = if j ≤ i then p.coeff (2 * (i - j)) else 0 := by
-  simp [toeplitz, hurwitz_coeff_odd_row]
+    hurwitz (fun k ↦ p.coeff k) (2 * i + 1) j = if j ≤ i then p.coeff (2 * (i - j)) else 0 := by
+  simp
 
 /-- Unfolded finite-minor form of
 `HurwitzStableToMatrixTotallyNonnegativeStatement`.

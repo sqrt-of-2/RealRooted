@@ -426,25 +426,16 @@ theorem matPolyAction_veroneseLinearFactorMatrixDesc
           (r := r) (k := r - 1 - (i.1 + 1)) hk_lt a p
       simp [matPolyAction, veroneseLinearFactorMatrixDesc,
         veroneseSectionPolynomialListDesc, i] at hrow ⊢
-      rw [hrow]
-      simpa [i, add_comm, add_left_comm, add_assoc, hk_succ] using hrec.symm
+      grind
     · have hrow :=
         zipWith_mul_veroneseLinearFactorRowDesc_sum_eq_of_last
           (r := r) a i hi (veroneseSectionPolynomialListDesc r p)
           (length_veroneseSectionPolynomialListDesc r p)
-      have hi_last : i.1 = r - 1 := by
-        have hle : r ≤ i.1 + 1 := Nat.le_of_not_gt hi
-        have hle' : i.1 + 1 ≤ r := Nat.succ_le_of_lt i.2
-        have hs : i.1 + 1 = r := le_antisymm hle' hle
-        exact Nat.eq_sub_of_add_eq hs
+      have : i.1 = r - 1 := by grind
       have hrec := veroneseSectionPolynomial_X_add_C_mul_zero (r := r) hr a p
       simp [matPolyAction, veroneseLinearFactorMatrixDesc,
         veroneseSectionPolynomialListDesc, i] at hrow ⊢
-      rw [hrow]
-      rw [show r - 1 - n = 0 by
-        simpa [i] using congrArg (fun m => r - 1 - m) hi_last]
-      rw [hrec]
-      ring
+      grind
 
 /-! ## Cyclic matrix 2-by-2 check and preserver step -/
 
@@ -1053,8 +1044,6 @@ theorem isRealRootedOrZero_veroneseSectionPolynomial_of_realRooted_nonneg_matrix
     isInterlacingSeq0Nonneg_and_real_veroneseSectionPolynomialListDesc_of_realRooted_nonneg
       (r := r) hr hpnn hprr_ne hprr_splits
   have hmem := mem_veroneseSectionPolynomialListDesc (r := r) (k := k) p hk
-  by_cases hzero : veroneseSectionPolynomial r k p = 0
-  · exact Or.inl hzero
-  · exact Or.inr (hpkg.2 _ hmem hzero).2
+  grind
 
 end RealRooted

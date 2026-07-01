@@ -39,9 +39,9 @@ lemma eq_zero_or_ne_zero_and_splits_iff_eq_zero_or_ne_zero_and_card_roots (p : �
     (p = 0 ∨ (p ≠ 0 ∧ p.Splits)) ↔
       (p = 0 ∨ (p ≠ 0 ∧ p.roots.card = p.natDegree)) := by
   constructor <;> rintro (rfl | h)
-  · exact Or.inl rfl
+  · simp
   · exact Or.inr (ne_zero_and_card_roots_of_ne_zero_and_splits h.1 h.2)
-  · exact Or.inl rfl
+  · simp
   · exact Or.inr (ne_zero_and_splits_of_ne_zero_and_card_roots h.1 h.2)
 
 /-! ## Root interleaving predicates on sorted lists -/
@@ -195,8 +195,7 @@ lemma listAlternates_symm_of_sum_le {ss rs : List ℝ}
     ListAlternates rs ss := by
   have h_eq : ss = rs :=
     list_eq_of_forall₂_le_of_sum_ge (listAlternates_forall₂_le halt) hsum
-  subst ss
-  simpa using halt
+  simp_all
 
 lemma listInterlaces_left_le_of_right_le {ss rs : List ℝ} {c : ℝ}
     (hint : ListInterlaces ss rs)
@@ -247,7 +246,7 @@ lemma listAlternates_left_le_of_right_le {ss rs : List ℝ} {c : ℝ}
           rcases ht with rfl | ht
           · exact le_trans hsr (hrs r (by simp))
           · exact listInterlaces_left_le_of_right_le htail
-              (fun x hx => hrs x (by lia)) t ht
+              (fun x hx ↦ hrs x (by assumption)) t ht
 
 lemma listAlternates_all_le_getLast {ss rs : List ℝ}
     (hrs_ne : rs ≠ [])
@@ -284,7 +283,7 @@ theorem roots_le_of_prec_right {f g : ℝ[X]} {c : ℝ}
     exact hg_le r (by rw [← hrs_eq]; exact Multiset.mem_coe.mpr hr)
   intro r hr
   have hr' : r ∈ ss := by
-    have : r ∈ (↑ss : Multiset ℝ) := by lia
+    have : r ∈ (↑ss : Multiset ℝ) := by simp [*]
     exact Multiset.mem_coe.mp this
   rcases hshape with ⟨_, hint⟩ | ⟨_, halt⟩
   · exact listInterlaces_left_le_of_right_le hint hrs_le r hr'
@@ -304,8 +303,7 @@ theorem roots_sum_le_of_prec_sameDegree {f g : ℝ[X]}
   have hsum_rs : rs.sum = g.roots.sum := by
     rw [← Multiset.sum_coe, hrs_eq]
   rcases hshape with ⟨hlen, _⟩ | ⟨_, halt⟩
-  · exfalso
-    lia
+  · simp_all
   · have hle : ss.sum ≤ rs.sum := listAlternates_sum_le halt
     linarith
 
@@ -321,7 +319,7 @@ theorem nextCoeff_le_of_prec_sameDegree_monic {f g : ℝ[X]}
     h.1.2.nextCoeff_eq_neg_sum_roots_of_monic hf_monic
   have hg_next : g.nextCoeff = -g.roots.sum :=
     h.2.1.2.nextCoeff_eq_neg_sum_roots_of_monic hg_monic
-  linarith
+  simp [*]
 
 /-- In the same-degree case, a reverse `Prec g f` can be flipped back to
 `Prec f g` once the root sums have the forward order. -/
@@ -339,12 +337,11 @@ theorem prec_of_reverse_prec_of_roots_sum_le {f g : ℝ[X]}
   have hsum_rs : rs.sum = f.roots.sum := by
     rw [← Multiset.sum_coe, hrs_eq]
   rcases hshape with ⟨hlen, _⟩ | ⟨hlen, halt⟩
-  · exfalso
-    lia
+  · simp_all
   · refine ⟨hf, hg, rs, ss, hrs, hss, hrs_eq, hss_eq, Or.inr ⟨?_, ?_⟩⟩
-    · lia
+    · simp [*]
     · apply listAlternates_symm_of_sum_le halt
-      linarith
+      simp [*]
 
 /-- Relaxed interlacing convention used in some recursive arguments:
 `Prec0 f g` holds if either side is zero, or if `Prec f g` holds in the
@@ -387,7 +384,7 @@ lemma Interlaces.toPrec {g f : ℝ[X]} (h : Interlaces g f) : Prec g f := by
     rw [← Multiset.coe_card, hss_eq, (card_roots_of_splits hg.2)]
   have : rs.length = f.natDegree := by
     rw [← Multiset.coe_card, hrs_eq, (card_roots_of_splits hf.2)]
-  lia
+  simp [*]
 
 lemma Prec.toInterlaces {g f : ℝ[X]} (h : Prec g f)
     (hdeg : g.natDegree + 1 = f.natDegree) : Interlaces g f := by
@@ -461,7 +458,7 @@ lemma quadratic_nonneg_on_unit_interval_of_endpoint_nonneg_of_c_nonneg
     have : 0 ≤ (1 - β) * A + β * (A + B) :=
       add_nonneg (mul_nonneg (sub_nonneg_of_le hβ1) hA) (mul_nonneg hβ0 hEnd')
     have : A + B * β + C * β ^ 2 = (1 - β) * A + β * (A + B) := by grind
-    lia
+    simp [*]
 
 lemma quadratic_nonneg_on_unit_interval_of_endpoint_nonneg_of_vertex_or_discriminant
     {A B C β : ℝ}
@@ -512,7 +509,7 @@ lemma exists_rightmost_root_of_isRealRooted
   · intro s hs
     have hs_mem : s ∈ rs := by
       apply Multiset.mem_coe.mp
-      lia
+      simp [*]
     exact hrs_sorted.rel_getLast hs_mem
 
 /-- For a nonempty right-hand list, `ListInterlaces` forces the expected length
@@ -520,7 +517,7 @@ relation. -/
 lemma listInterlaces_cons_length_eq :
     ∀ {ss rest : List ℝ} {r : ℝ},
       ListInterlaces ss (r :: rest) → ss.length = rest.length
-  | [], [], _, _ => by lia
+  | [], [], _, _ => by simp [*]
   | _ :: _, [], _, h => by simp [ListInterlaces] at h
   | s :: ss, r₂ :: rest, r₁, h => by
       obtain ⟨_, _, htail⟩ := h

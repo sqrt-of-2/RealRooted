@@ -119,7 +119,7 @@ private lemma narayanaCoeffB_natDegree (n : Nat) (hn : 1 ≤ n) :
   have hmul_ne :
       (C ((-(n : ℝ)) / (n + 3 : ℝ))).leadingCoeff * ((1 - X : ℝ[X]) ^ 2).leadingCoeff ≠ 0 := by
     rw [leadingCoeff_C, leadingCoeff_one_sub_X_sq]
-    simpa using hcoeff_ne
+    grind
   rw [natDegree_mul' hmul_ne, natDegree_C, natDegree_one_sub_X_sq]
 
 private lemma narayanaCoeffB_leadingCoeff (n : Nat) (hn : 1 ≤ n) :
@@ -130,7 +130,7 @@ private lemma narayanaCoeffB_leadingCoeff (n : Nat) (hn : 1 ≤ n) :
   have hmul_ne :
       (C ((-(n : ℝ)) / (n + 3 : ℝ))).leadingCoeff * ((1 - X : ℝ[X]) ^ 2).leadingCoeff ≠ 0 := by
     rw [leadingCoeff_C, leadingCoeff_one_sub_X_sq]
-    simpa using hcoeff_ne
+    grind
   rw [leadingCoeff_mul' hmul_ne, leadingCoeff_C, leadingCoeff_one_sub_X_sq]
   lia
 

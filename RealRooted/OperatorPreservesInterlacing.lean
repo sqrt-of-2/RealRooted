@@ -47,7 +47,7 @@ theorem preservesAllComboPairs_of_preservesRealRootedOrZero
   · simp [hmap, hzero]
   · rcases hT (C α * f + C β * g) ⟨hzero, hall α β⟩ with hTzero | hrr
     · simp [hmap, hTzero]
-    · simpa [hmap] using hrr
+    · simp_all
 
 /-- Real-rootedness-preserving linear operators preserve interlacing up to the
 order ambiguity built into the current oriented `Prec` predicate. Zero images

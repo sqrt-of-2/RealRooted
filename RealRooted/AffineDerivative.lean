@@ -101,7 +101,7 @@ lemma natDegree_affineDeriv {f : ℝ[X]} (hf : f ≠ 0) (hdeg : 1 ≤ f.natDegre
                   · calc (1 - X : ℝ[X]).natDegree
                         ≤ max (1 : ℝ[X]).natDegree X.natDegree := natDegree_sub_le _ _
                       _ = 1 := by simp [natDegree_one, natDegree_X]
-                  · exact natDegree_derivative_le f
+                  · simp
               _ = f.natDegree := by lia
       _ = f.natDegree := max_self _
   · -- Lower bound: the coefficient at degree d is (c - d) * lc(f) ≠ 0
@@ -962,9 +962,7 @@ theorem prec_affine_derivative {f : ℝ[X]} (hf : f.Splits)
       lia
     have hg_fact' : g = (X - C r₁) ^ (m - 1) * qg := by
       lia
-    have hq_ne : q ≠ 0 := by
-      intro hq
-      simpa [hf_fact', hq] using hf₀.ne_zero
+    have hq_ne : q ≠ 0 := by grind
     have hqg_ne : qg ≠ 0 := by
       intro hqg
       simpa [hg_fact', hqg] using hg₀.ne_zero
@@ -1158,7 +1156,7 @@ theorem prec_affine_derivative_deg_one {f : ℝ[X]} (hf : f.Splits)
     rw [eval_affineDeriv_at_root hr_root c]
     apply mul_pos (by linarith)
     -- f has degree 1, so f' is a positive constant
-    have hdeg0 : f.derivative.natDegree = 0 := by have := natDegree_derivative_le f; lia
+    have hdeg0 : f.derivative.natDegree = 0 := by simp_all
     have hc0 : f.derivative.coeff 0 = f.leadingCoeff := by
       rw [coeff_derivative]; simp [Polynomial.leadingCoeff, hdeg]
     rw [eq_C_of_natDegree_eq_zero hdeg0, eval_C, hc0]

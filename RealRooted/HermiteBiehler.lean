@@ -99,9 +99,9 @@ lemma monomial_comp_X_sq (n : ℕ) (a : ℝ) :
     rw [monomial_comp_X_sq]
     by_cases hmn : m = n
     · simp_all
-    · have h2 : 2 * m ≠ 2 * n := by lia
+    · have h2 : 2 * m ≠ 2 * n := by simp [*]
       rw [Polynomial.coeff_monomial, Polynomial.coeff_monomial]
-      lia
+      simp [*]
 
 @[simp] lemma coeff_comp_X_sq_odd (p : ℝ[X]) (n : ℕ) :
     (p.comp (X ^ 2 : ℝ[X])).coeff (2 * n + 1) = 0 := by
@@ -149,8 +149,7 @@ theorem oddEvenPolynomial_eq_iff {p q r s : ℝ[X]} :
     oddEvenPolynomial p q = oddEvenPolynomial r s ↔ p = r ∧ q = s := by
   constructor
   · exact oddEvenPolynomial_inj
-  · rintro ⟨rfl, rfl⟩
-    rfl
+  · simp_all
 
 @[simp] theorem oddEvenPolynomial_zero_zero :
     oddEvenPolynomial (0 : ℝ[X]) 0 = 0 := by
@@ -165,14 +164,8 @@ theorem oddEvenPolynomial_ne_zero_iff {p q : ℝ[X]} :
     oddEvenPolynomial p q ≠ 0 ↔ p ≠ 0 ∨ q ≠ 0 := by
   constructor
   · intro h
-    by_cases hp : p = 0
-    · right
-      intro hq
-      exact h (by simp [hp, hq])
-    · exact Or.inl hp
-  · rintro (hp | hq) hzero
-    · exact hp (oddEvenPolynomial_eq_zero_iff.mp hzero).1
-    · exact hq (oddEvenPolynomial_eq_zero_iff.mp hzero).2
+    by_cases hp : p = 0 <;> simp_all
+  · rintro (hp | hq) hzero <;> simp_all
 
 theorem hasNonnegCoeffs_oddEvenPolynomial {p q : ℝ[X]}
     (hp : HasNonnegCoeffs p) (hq : HasNonnegCoeffs q) :
@@ -282,8 +275,8 @@ theorem eval_pos_of_hasNonnegCoeffs {f : ℝ[X]} (hf : HasNonnegCoeffs f)
   · intro n hn
     have hcoeff : 0 < f.coeff n :=
       lt_of_le_of_ne (hf n) (Ne.symm (Polynomial.mem_support_iff.mp hn))
-    positivity
-  · exact Polynomial.support_nonempty.mpr hf0
+    simp [*]
+  · simp_all
 
 /-- First-quadrant form of the forward Hermite--Biehler/Hurwitz conformal
 substitution: it suffices to exclude roots of `q(x²) + x p(x²)` in the open
@@ -342,23 +335,16 @@ theorem hermiteBiehlerStableToHurwitzOddEven_of_firstQuadrant
     intro h0
     rw [oddEvenPolynomial_eq_zero_iff] at h0
     obtain ⟨hp0, hq0⟩ := h0
-    have hI := hstable Complex.I (by rw [Complex.I_im]; norm_num)
-    apply hI
-    simp [hermiteBiehlerPolynomial, complexify, hp0, hq0]
+    have hI := hstable Complex.I (by simp)
+    simp_all
   rcases lt_trichotomy z.im 0 with him | him | him
   · -- Lower half-plane: reduce to the first quadrant by conjugation.
     have hconj := eval_complexify_conj (oddEvenPolynomial p q) z
-    have hre : 0 < (starRingEnd ℂ z).re := by
-      rw [Complex.conj_re]
-      exact hzre
-    have hci : 0 < (starRingEnd ℂ z).im := by
-      rw [Complex.conj_im]
-      linarith
+    have hre : 0 < (starRingEnd ℂ z).re := by simp_all
+    have hci : 0 < (starRingEnd ℂ z).im := by simp_all
     have hne : (complexify (oddEvenPolynomial p q)).eval (starRingEnd ℂ z) ≠ 0 :=
       h hp hq hstable (starRingEnd ℂ z) hre hci
-    intro h0
-    apply hne
-    rw [hconj, h0, map_zero]
+    grind
   · -- Real axis: positivity of the nonnegative-coefficient polynomial.
     have hz : z = ((z.re : ℝ) : ℂ) := by
       apply Complex.ext <;> simp [him]

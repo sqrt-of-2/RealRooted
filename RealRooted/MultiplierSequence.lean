@@ -31,13 +31,7 @@ def diagonalOperator (gamma : ℕ → ℝ) (p : ℝ[X]) : ℝ[X] :=
   rw [diagonalOperator, Polynomial.coeff_sum]
   simp only [Polynomial.coeff_monomial]
   rw [Polynomial.sum_def]
-  rw [Finset.sum_eq_single n]
-  · simp
-  · intro b _ hbn
-    simp [hbn]
-  · intro hn
-    rw [(Polynomial.notMem_support_iff).mp hn]
-    simp
+  simp_all
 
 @[simp] theorem diagonalOperator_zero (gamma : ℕ → ℝ) :
     diagonalOperator gamma 0 = 0 := by
@@ -86,15 +80,13 @@ theorem diagonalOperator_monomial (gamma : ℕ → ℝ) (n : ℕ) (a : ℝ) :
     diagonalOperator gamma (monomial n a) = monomial n (gamma n * a) := by
   ext k
   by_cases hk : k = n
-  · subst k
-    simp
+  · simp_all
   · simp [Polynomial.coeff_monomial, Ne.symm hk]
 
 theorem support_diagonalOperator_subset (gamma : ℕ → ℝ) (p : ℝ[X]) :
     (diagonalOperator gamma p).support ⊆ p.support := by
   intro n hn
-  rw [Polynomial.mem_support_iff] at hn ⊢
-  exact right_ne_zero_of_mul (by simpa using hn)
+  simp_all
 
 theorem natDegree_diagonalOperator_le (gamma : ℕ → ℝ) (p : ℝ[X]) :
     (diagonalOperator gamma p).natDegree ≤ p.natDegree := by
@@ -142,24 +134,19 @@ def jensenPolynomial (n : ℕ) (gamma : ℕ → ℝ) : ℝ[X] :=
       if k ≤ n then (Nat.choose n k : ℝ) * gamma k else 0 := by
   classical
   by_cases hk : k ≤ n
-  · have hmem : k ∈ Finset.range (n + 1) := by
-      simpa [Nat.lt_succ_iff] using hk
+  · have hmem : k ∈ Finset.range (n + 1) := by simp_all
     rw [jensenPolynomial, Polynomial.finsetSum_coeff]
     rw [Finset.sum_eq_single k]
     · simp [hk]
     · intro b hb hbk
       simp [Polynomial.coeff_monomial, hbk]
-    · intro hnot
-      exact (hnot hmem).elim
+    · simp_all
   · rw [jensenPolynomial, Polynomial.finsetSum_coeff]
     rw [Finset.sum_eq_zero]
     · simp [hk]
     · intro b hb
       have hb_le : b ≤ n := Nat.lt_succ_iff.mp (Finset.mem_range.mp hb)
-      have hne : k ≠ b := by
-        intro hkb
-        subst k
-        exact hk hb_le
+      have hne : k ≠ b := by grind
       have hbk : b ≠ k := Ne.symm hne
       simp [Polynomial.coeff_monomial, hbk]
 
@@ -175,19 +162,12 @@ theorem hasNonnegCoeffs_jensenPolynomial
 theorem natDegree_jensenPolynomial_le (n : ℕ) (gamma : ℕ → ℝ) :
     (jensenPolynomial n gamma).natDegree ≤ n := by
   rw [Polynomial.natDegree_le_iff_coeff_eq_zero]
-  intro k hk
-  rw [coeff_jensenPolynomial]
-  simp [not_le_of_gt hk]
+  simp_all
 
 theorem support_jensenPolynomial_subset (n : ℕ) (gamma : ℕ → ℝ) :
     (jensenPolynomial n gamma).support ⊆ Finset.range (n + 1) := by
   intro k hk
-  rw [Polynomial.mem_support_iff] at hk
-  rw [coeff_jensenPolynomial] at hk
-  have hk_le : k ≤ n := by
-    by_contra hle
-    simp [hle] at hk
-  simpa [Finset.mem_range, Nat.lt_succ_iff] using hk_le
+  simp_all
 
 /-- Finite multiplier sequence up to degree `n`: the diagonal operator
 preserves real-rootedness, allowing the zero polynomial. -/
@@ -239,8 +219,7 @@ theorem isFinitePFMultiplierSequence_of_finiteMultiplierSequence
     IsFinitePFMultiplierSequence n gamma := by
   intro p hp hdeg
   by_cases hp0 : p = 0
-  · subst p
-    simpa using IsPFPolynomial.zero
+  · simp_all
   have hsplit := hmult hdeg (hp.ne_zero_and_splits hp0).2
   rcases hsplit with hzero | hsplits
   · rw [hzero]

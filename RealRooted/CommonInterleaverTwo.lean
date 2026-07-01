@@ -294,10 +294,7 @@ lemma toPosComboRealRooted {f g : ℝ[X]} (h : Compatible f g)
       · exact
           hasPosLeadingCoeff_pos_combo_of_natDegree_le_left
             (le_of_not_ge hdeg) hf_pos hg_pos hα hβ
-    have hsum_ne : C α * f + C β * g ≠ 0 := by
-      intro hsum
-      simp [HasPosLeadingCoeff, hsum] at hsum_pos
-    lia
+    simp_all
   · lia
 
 /-- In equal degree, strict positive-combination real-rootedness upgrades to
@@ -1084,11 +1081,10 @@ theorem posComboNoCommonSameDegreePairHasCommonInterleaver_of_orientationAlterna
   have hslot :
       ∀ j (hj : j < f.natDegree + 1),
         (rootSlotInterval (rootSeqDesc f)
-            ⟨j, by simpa [rootSeqDesc_length hf_rr.2] using hj⟩ ∩
+            ⟨j, by simp_all⟩ ∩
           rootSlotInterval (rootSeqDesc g)
             ⟨j, by
-              have : j < g.natDegree + 1 := by lia
-              simpa [rootSeqDesc_length hg_rr.2] using this⟩).Nonempty := by
+              simp_all⟩).Nonempty := by
     rcases hsame hf_pos hg_pos hfnn hgnn hfg hdeg hno with hprec | hprec
     · intro j hj
       have hjg : j < g.natDegree + 1 := by lia

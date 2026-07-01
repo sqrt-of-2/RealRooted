@@ -32,13 +32,7 @@ def hadamardProduct (p q : ℝ[X]) : ℝ[X] :=
   rw [hadamardProduct, Polynomial.coeff_sum]
   simp only [Polynomial.coeff_monomial]
   rw [Polynomial.sum_def]
-  rw [Finset.sum_eq_single n]
-  · simp
-  · intro b _ hbn
-    simp [hbn]
-  · intro hn
-    rw [(Polynomial.notMem_support_iff).mp hn]
-    simp
+  simp_all
 
 theorem hadamardProduct_comm (p q : ℝ[X]) :
     hadamardProduct p q = hadamardProduct q p := by
@@ -112,8 +106,7 @@ theorem hadamardProduct_oddEvenPolynomial (p q p' q' : ℝ[X]) :
   · subst hk
     rw [show k + k = 2 * k by ring]
     simp
-  · subst hk
-    simp
+  · simp_all
 
 /-- Nonnegative-coefficient Schur--Polya/Garloff--Wagner real-rootedness
 interface for coefficientwise Hadamard products.
@@ -140,11 +133,9 @@ theorem IsPFPolynomial.hadamardProduct
     (hp : IsPFPolynomial p) (hq : IsPFPolynomial q) :
     IsPFPolynomial (hadamardProduct p q) := by
   by_cases hp0 : p = 0
-  · subst p
-    simpa using IsPFPolynomial.zero
+  · simp_all
   by_cases hq0 : q = 0
-  · subst q
-    simpa using IsPFPolynomial.zero
+  · simp_all
   rcases hGW hp.hasNonnegCoeffs hq.hasNonnegCoeffs
       (hp.ne_zero_and_splits hp0)
       (hq.ne_zero_and_splits hq0) with ⟨hrr, hnn, hroots⟩

@@ -34,7 +34,7 @@ lemma toeplitz_apply (a : ℕ → ℝ) (i j : ℕ) :
 @[to_fun (attr := simp)]
 lemma toeplitz_zero : toeplitz 0 = 0 := by
   ext
-  simp [toeplitz]
+  simp
 
 /-- A sequence is a Polya-frequency sequence. -/
 def IsPolyaFreqSeq (a : ℕ → ℝ) : Prop :=
@@ -107,8 +107,7 @@ theorem aissenSchoenbergWhitneyForward_of_noNonneg
     aissenSchoenbergWhitneyForwardStatement := by
   intro p hpf
   by_cases hp0 : p = 0
-  · subst p
-    simp
+  · simp_all
   · exact ⟨(hASW hp0 hpf).1.2, (hASW hp0 hpf).2⟩
 
 /-- The two forward ASW interfaces are equivalent. -/
@@ -133,10 +132,7 @@ theorem aissenSchoenbergWhitneyForward_of_orZero
   have hnn : HasNonnegCoeffs p :=
     hasNonnegCoeffs_of_IsPolyaFreqSeq_coeff hpf
   have h := hASW hnn hpf
-  rcases h with ⟨hzero | hsplits, hroots⟩
-  · subst p
-    simp
-  · exact ⟨hsplits, hroots⟩
+  rcases h with ⟨hzero | hsplits, hroots⟩ <;> simp_all
 
 /-- The strict and zero-aware forward ASW interfaces are equivalent. -/
 theorem aissenSchoenbergWhitneyForward_iff_orZero :
@@ -156,10 +152,9 @@ theorem not_aissenSchoenbergWhitneyForward_without_nonzero :
   intro h
   have hnn : HasNonnegCoeffs (0 : ℝ[X]) := by
     simp [HasNonnegCoeffs]
-  have hpf : IsPolyaFreqSeq (fun n => (0 : ℝ[X]).coeff n) := by
+  have hpf : IsPolyaFreqSeq (fun n ↦ (0 : ℝ[X]).coeff n) := by
     simpa using IsPolyaFreqSeq_zero
-  have hbad := h hnn hpf
-  exact hbad.1.1 rfl
+  grind
 
 lemma toeplitz_one_coeff : toeplitz (fun n ↦ (1 : ℝ[X]).coeff n) = 1 := by
   ext i j
@@ -256,7 +251,7 @@ lemma toeplitz_const_coeff (c : ℝ) :
   simp only [toeplitz_apply, coeff_C, Matrix.smul_apply, Matrix.one_apply]
   split_ifs
   any_goals simp_all
-  all_goals lia
+  grind
 
 lemma IsPolyaFreqSeq.const (c : ℝ) (hc : 0 ≤ c) :
     IsPolyaFreqSeq (fun n ↦ (C c : ℝ[X]).coeff n) := by
@@ -363,9 +358,9 @@ lemma hybrid_nonneg_aux {n : ℕ} (rows cols : Fin n → ℕ) (hrows : StrictMon
       let C := hybrid rows cols M a (k + 1) choices2
       have hdk : n - (k + 1) = d := by lia
       have hB_nonneg : 0 ≤ B.det :=
-        ih rows cols hrows hcols (k + 1) (by lia) hdk choices1
+        ih rows cols hrows hcols (k + 1) (by simp [*]) hdk choices1
       have hC_nonneg : 0 ≤ C.det :=
-        ih rows cols hrows hcols (k + 1) (by lia) hdk choices2
+        ih rows cols hrows hcols (k + 1) (by simp [*]) hdk choices2
       have h_update : hybrid rows cols M a k choices =
           updateRow C ⟨k, hk_lt⟩ (a • B ⟨k, hk_lt⟩ + C ⟨k, hk_lt⟩) := by
         ext i j
