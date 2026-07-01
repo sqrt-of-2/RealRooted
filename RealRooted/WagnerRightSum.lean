@@ -333,7 +333,7 @@ The count equality (3) follows from the interlacing giving one root per interval
 
 /-- Evaluation of a real-rooted polynomial via its factorization. -/
 lemma eval_eq_leadingCoeff_mul_prod_sub {p : ℝ[X]}
-  (hp_splits : p.Splits) (x : ℝ) :
+    (hp_splits : p.Splits) (x : ℝ) :
     p.eval x = p.leadingCoeff * (p.roots.map (x - ·)).prod := by
   have hfact := C_leadingCoeff_mul_prod_multiset_X_sub_C (card_roots_of_splits hp_splits)
   conv_lhs => rw [← hfact]

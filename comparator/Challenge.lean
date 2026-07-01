@@ -64,7 +64,7 @@ def Prec (f g : ℝ[X]) : Prop :=
     ss.Pairwise (· ≤ ·) ∧ rs.Pairwise (· ≤ ·) ∧
     (↑ss : Multiset ℝ) = f.roots ∧ (↑rs : Multiset ℝ) = g.roots ∧
     ((ss.length + 1 = rs.length ∧ ListInterlaces ss rs) ∨
-     (ss.length = rs.length ∧ ListAlternates ss rs))
+      (ss.length = rs.length ∧ ListAlternates ss rs))
 
 /-- Strict same-degree interlacing: both polynomials are nonzero and
 real-rooted with the same degree, and the roots of `p` strictly interleave
