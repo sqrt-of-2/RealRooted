@@ -15,6 +15,8 @@ namespace Tactic
 @[rr_degree] theorem rr_certificates_degree_smoke : True := by
   trivial
 
+example : True := by
+  trivial
 
 end Tactic
 end RealRooted

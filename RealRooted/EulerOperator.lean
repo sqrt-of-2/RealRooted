@@ -106,19 +106,14 @@ theorem HasNonnegCoeffs.polarTheta {N : ℕ} {p : ℝ[X]}
 
 /-- Classical Rolle input: `theta` preserves real-rootedness and nonpositive
 roots on the polynomial PF cone. -/
-def thetaPreservesRealRootedOrZeroStatement : Prop :=
+abbrev thetaPreservesRealRootedOrZeroStatement : Prop :=
   ∀ {p : ℝ[X]},
     IsPFPolynomial p →
     (theta p = 0 ∨ (theta p).Splits) ∧ ∀ r ∈ (theta p).roots, r ≤ 0
 
 /-- Classical Rolle input: `theta` preserves the polynomial PF cone. -/
-def thetaPreservesPFStatement : Prop :=
+abbrev thetaPreservesPFStatement : Prop :=
   ∀ {p : ℝ[X]}, IsPFPolynomial p → IsPFPolynomial (theta p)
-
-theorem thetaPreservesPF_of_realRootedOrZero
-    (hθ : thetaPreservesRealRootedOrZeroStatement) :
-    thetaPreservesPFStatement :=
-  fun {_} hp => ⟨hp.hasNonnegCoeffs.theta, (hθ hp).1, (hθ hp).2⟩
 
 theorem theta_preserves_pf : thetaPreservesPFStatement := by
   intro p hp
@@ -130,78 +125,89 @@ theorem thetaPreservesRealRootedOrZero : thetaPreservesRealRootedOrZeroStatement
   have htheta : IsPFPolynomial (theta p) := theta_preserves_pf hp
   exact ⟨htheta.eq_zero_or_splits, htheta.roots_nonpos⟩
 
+theorem thetaPreservesPF_of_realRootedOrZero :
+    thetaPreservesPFStatement :=
+  fun {_} hp => ⟨hp.hasNonnegCoeffs.theta,
+    (thetaPreservesRealRootedOrZero hp).1, (thetaPreservesRealRootedOrZero hp).2⟩
+
 /-- Classical Rolle input: `theta` preserves weak proper position on the
 polynomial PF cone. -/
-def thetaPreservesPrec0Statement : Prop :=
+abbrev thetaPreservesPrec0Statement : Prop :=
   ∀ {p q : ℝ[X]},
     IsPFPolynomial p →
     IsPFPolynomial q →
     Prec0 p q →
     Prec0 (theta p) (theta q)
 
-theorem thetaPreservesPrec0_of_derivative
-    (hderiv : derivativePreservesPrec0Statement) : thetaPreservesPrec0Statement := by
+theorem thetaPreservesPrec0_of_derivative : thetaPreservesPrec0Statement := by
   intro p q hp hq hpq
   simpa [theta] using
-    prec0_X_mul_both_of_pf hp.derivative hq.derivative (hderiv hpq)
+    prec0_X_mul_both_of_pf hp.derivative hq.derivative (derivativePreservesPrec0 hpq)
 
 /-- `theta` preserves weak proper position on the polynomial PF cone, obtained
 from the derivative preservation theorem and multiplication by `X`. -/
 theorem thetaPreservesPrec0 : thetaPreservesPrec0Statement :=
-  thetaPreservesPrec0_of_derivative derivativePreservesPrec0
+  thetaPreservesPrec0_of_derivative
 
 /-- Classical Rolle input: `theta + 1` preserves real-rootedness and
 nonpositive roots on the polynomial PF cone. -/
-def thetaPlusOnePreservesRealRootedOrZeroStatement : Prop :=
+abbrev thetaPlusOnePreservesRealRootedOrZeroStatement : Prop :=
   ∀ {p : ℝ[X]},
     IsPFPolynomial p →
     (thetaPlusOne p = 0 ∨ (thetaPlusOne p).Splits) ∧
       ∀ r ∈ (thetaPlusOne p).roots, r ≤ 0
 
 /-- Classical Rolle input: `theta + 1` preserves the polynomial PF cone. -/
-def thetaPlusOnePreservesPFStatement : Prop :=
+abbrev thetaPlusOnePreservesPFStatement : Prop :=
   ∀ {p : ℝ[X]}, IsPFPolynomial p → IsPFPolynomial (thetaPlusOne p)
-
-theorem thetaPlusOnePreservesPF_of_realRootedOrZero
-    (hθ : thetaPlusOnePreservesRealRootedOrZeroStatement) :
-    thetaPlusOnePreservesPFStatement :=
-  fun {_} hp => ⟨hp.hasNonnegCoeffs.thetaPlusOne, (hθ hp).1, (hθ hp).2⟩
 
 theorem thetaPlusOne_preserves_pf : thetaPlusOnePreservesPFStatement := by
   intro p hp
   simpa [thetaPlusOne_eq_derivative_X_mul] using hp.X_mul.derivative
 
+theorem thetaPlusOnePreservesRealRootedOrZero :
+    thetaPlusOnePreservesRealRootedOrZeroStatement := by
+  intro p hp
+  have htheta := thetaPlusOne_preserves_pf hp
+  exact ⟨htheta.eq_zero_or_splits, htheta.roots_nonpos⟩
+
+theorem thetaPlusOnePreservesPF_of_realRootedOrZero :
+    thetaPlusOnePreservesPFStatement :=
+  fun {_} hp => ⟨hp.hasNonnegCoeffs.thetaPlusOne,
+    (thetaPlusOnePreservesRealRootedOrZero hp).1,
+    (thetaPlusOnePreservesRealRootedOrZero hp).2⟩
+
 /-- Classical Rolle input: `theta + 1` preserves weak proper position on the
 polynomial PF cone. -/
-def thetaPlusOnePreservesPrec0Statement : Prop :=
+abbrev thetaPlusOnePreservesPrec0Statement : Prop :=
   ∀ {p q : ℝ[X]},
     IsPFPolynomial p →
     IsPFPolynomial q →
     Prec0 p q →
     Prec0 (thetaPlusOne p) (thetaPlusOne q)
 
-theorem thetaPlusOnePreservesPrec0_of_derivative
-    (hderiv : derivativePreservesPrec0Statement) :
+theorem thetaPlusOnePreservesPrec0_of_derivative :
     thetaPlusOnePreservesPrec0Statement := by
   intro p q hp hq hpq
-  simpa [thetaPlusOne_eq_derivative_X_mul] using hderiv (prec0_X_mul_both_of_pf hp hq hpq)
+  simpa [thetaPlusOne_eq_derivative_X_mul] using
+    derivativePreservesPrec0 (prec0_X_mul_both_of_pf hp hq hpq)
 
 /-- `theta + 1` preserves weak proper position on the polynomial PF cone,
 obtained from the derivative preservation theorem via
 `thetaPlusOnePreservesPrec0_of_derivative`. -/
 theorem thetaPlusOnePreservesPrec0 : thetaPlusOnePreservesPrec0Statement :=
-  thetaPlusOnePreservesPrec0_of_derivative derivativePreservesPrec0
+  thetaPlusOnePreservesPrec0_of_derivative
 
 /-- Classical Rolle input: a PF polynomial is in weak proper position with
 each of its iterates under `theta + 1`. -/
-def iterateThetaPlusOneSelfPrec0Statement : Prop :=
+abbrev iterateThetaPlusOneSelfPrec0Statement : Prop :=
   ∀ {p : ℝ[X]} (l : ℕ),
     IsPFPolynomial p →
     Prec0 p (iterateThetaPlusOne l p)
 
 /-- Classical polar-derivative input: `N - theta` preserves real-rootedness and
 nonpositive roots for polynomial PF-cone elements of degree at most `N`. -/
-def polarThetaPreservesRealRootedOrZeroStatement : Prop :=
+abbrev polarThetaPreservesRealRootedOrZeroStatement : Prop :=
   ∀ {N : ℕ} {p : ℝ[X]},
     IsPFPolynomial p →
     p.natDegree ≤ N →
@@ -210,7 +216,7 @@ def polarThetaPreservesRealRootedOrZeroStatement : Prop :=
 
 /-- The polar-theta operator `N - theta` preserves the polynomial PF cone for
 polynomials of degree at most `N`. -/
-def polarThetaPreservesPFStatement : Prop :=
+abbrev polarThetaPreservesPFStatement : Prop :=
   ∀ {N : ℕ} {p : ℝ[X]},
     IsPFPolynomial p →
     p.natDegree ≤ N →
@@ -273,15 +279,22 @@ theorem polarTheta_preserves_pf : polarThetaPreservesPFStatement := by
     exact Nat.sub_le_sub_right hdeg_shift 1
   exact reciprocalShift_preserves_pf hshift.derivative hder_deg
 
-theorem polarThetaPreservesPF_of_realRootedOrZero
-    (hNθ : polarThetaPreservesRealRootedOrZeroStatement) :
+theorem polarThetaPreservesRealRootedOrZero :
+    polarThetaPreservesRealRootedOrZeroStatement := by
+  intro N p hp hdeg
+  have htheta := polarTheta_preserves_pf hp hdeg
+  exact ⟨htheta.eq_zero_or_splits, htheta.roots_nonpos⟩
+
+theorem polarThetaPreservesPF_of_realRootedOrZero :
     polarThetaPreservesPFStatement :=
   fun {_ _} hp hdeg =>
-    ⟨hp.hasNonnegCoeffs.polarTheta hdeg, (hNθ hp hdeg).1, (hNθ hp hdeg).2⟩
+    ⟨hp.hasNonnegCoeffs.polarTheta hdeg,
+      (polarThetaPreservesRealRootedOrZero hp hdeg).1,
+      (polarThetaPreservesRealRootedOrZero hp hdeg).2⟩
 
 /-- Classical polar-derivative input: `N - theta` preserves weak proper position
 on the bounded-degree part of the polynomial PF cone. -/
-def polarThetaPreservesPrec0Statement : Prop :=
+abbrev polarThetaPreservesPrec0Statement : Prop :=
   ∀ {N : ℕ} {p q : ℝ[X]},
     IsPFPolynomial p →
     IsPFPolynomial q →
@@ -290,19 +303,15 @@ def polarThetaPreservesPrec0Statement : Prop :=
     Prec0 p q →
     Prec0 (polarTheta N p) (polarTheta N q)
 
-theorem iterateThetaPlusOne_preserves_pf
-    (hθ : thetaPlusOnePreservesPFStatement)
-    (l : ℕ) {p : ℝ[X]} (hp : IsPFPolynomial p) :
+theorem iterateThetaPlusOne_preserves_pf (l : ℕ) {p : ℝ[X]} (hp : IsPFPolynomial p) :
     IsPFPolynomial (iterateThetaPlusOne l p) := by
   induction l generalizing p with
   | zero =>
       simpa using hp
   | succ l ih =>
-      simpa [iterateThetaPlusOne_succ] using hθ (ih hp)
+      simpa [iterateThetaPlusOne_succ] using thetaPlusOne_preserves_pf (ih hp)
 
 theorem iterateThetaPlusOne_preserves_prec0
-    (hθpf : thetaPlusOnePreservesPFStatement)
-    (hθprec : thetaPlusOnePreservesPrec0Statement)
     (l : ℕ) {p q : ℝ[X]}
     (hp : IsPFPolynomial p) (hq : IsPFPolynomial q) (hpq : Prec0 p q) :
     Prec0 (iterateThetaPlusOne l p) (iterateThetaPlusOne l q) := by
@@ -310,9 +319,9 @@ theorem iterateThetaPlusOne_preserves_prec0
   | zero =>
       simpa using hpq
   | succ l ih =>
-      simpa [iterateThetaPlusOne_succ] using hθprec
-        (iterateThetaPlusOne_preserves_pf hθpf l hp)
-        (iterateThetaPlusOne_preserves_pf hθpf l hq)
+      simpa [iterateThetaPlusOne_succ] using thetaPlusOnePreservesPrec0
+        (iterateThetaPlusOne_preserves_pf l hp)
+        (iterateThetaPlusOne_preserves_pf l hq)
         (ih hp hq hpq)
 
 end RealRooted

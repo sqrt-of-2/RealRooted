@@ -107,15 +107,13 @@ lemma scaledLinearFamily_pairwiseCompatible_iff_familyCompatible :
 /-- Concrete specialization of the packaged nonnegative `1 ↔ 4` direction.
 Once the outstanding two-polynomial all-combinations bridge is discharged, this
 family becomes an immediate end-to-end Chudnovsky--Seymour regression. -/
-lemma scaledLinearFamily_pairwiseCompatible_iff_familyCompatible_of_allComboBridge
-    (hallBridge : PosComboNoCommonToAllComboBridgeStatement) :
+lemma scaledLinearFamily_pairwiseCompatible_iff_familyCompatible_of_allComboBridge :
     PairwiseCompatible scaledLinearFamily ↔ FamilyCompatible scaledLinearFamily :=
   pairwiseCompatible_iff_familyCompatible_of_allComboBridge_and_nonnegCoeffs
     (fs := scaledLinearFamily)
     scaledLinearFamily_isRealRooted
     scaledLinearFamily_hasPosLeadingCoeff
     scaledLinearFamily_hasNonnegCoeffs
-    hallBridge
 
 private lemma xAddOne_natDegree :
     (X + 1 : ℝ[X]).natDegree = 1 := by

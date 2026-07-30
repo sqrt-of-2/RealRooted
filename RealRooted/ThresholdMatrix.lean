@@ -857,7 +857,7 @@ theorem hzEntry_has2x2 : HZEntryHas2x2Statement := by
   exact (hzEntry_shape hα₁ hα₂ ht hj hcompat).has2x2
 
 lemma HZData.entry_has2x2 {q : ℕ} {rows : List (ℕ × ℝ[X])}
-    (hrows : HZData rows) (hentry : HZEntryHas2x2Statement) :
+    (hrows : HZData rows) :
     ∀ (i₁ i₂ : Fin rows.length) (j₁ j₂ : Fin q),
       i₁ ≤ i₂ → j₁ ≤ j₂ →
       Has2x2InterlacingProperty0
@@ -866,43 +866,21 @@ lemma HZData.entry_has2x2 {q : ℕ} {rows : List (ℕ × ℝ[X])}
         (hzEntry (rows.get i₂).1 (rows.get i₂).2 j₁.1)
         (hzEntry (rows.get i₂).1 (rows.get i₂).2 j₂.1) := by
   intro i₁ i₂ j₁ j₂ hi hj
-  exact hentry
+  exact hzEntry_has2x2
     (hrows.alpha_mem (rows.get i₁) (List.get_mem rows i₁))
     (hrows.alpha_mem (rows.get i₂) (List.get_mem rows i₂))
     (hrows.thresh_mono i₁ i₂ hi)
     hj
     (hrows.compat i₁ i₂ hi)
 
-/-- Haglund--Zhang threshold matrices preserve interlacing once the finite
-entrywise `2 x 2` check is available. -/
-theorem haglund_zhang_s_inversion_interlacing_backend
-    (hentry : HZEntryHas2x2Statement)
-    {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : HZData rows)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeqNonneg fs) :
-    IsInterlacingSeq0Nonneg (matPolyAction (hzMatrix q rows) fs) :=
-  thresholdMatrix_preserves_interlacing_seq0_of_entry rows
-    hrows.alpha_nonneg (hrows.entry_has2x2 hentry) fs hfs_len hfs
-
+/-- Haglund--Zhang threshold matrices preserve interlacing. -/
 theorem haglund_zhang_s_inversion_interlacing
     {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : HZData rows)
     (fs : List ℝ[X]) (hfs_len : fs.length = q)
     (hfs : IsInterlacingSeqNonneg fs) :
     IsInterlacingSeq0Nonneg (matPolyAction (hzMatrix q rows) fs) :=
-  haglund_zhang_s_inversion_interlacing_backend hzEntry_has2x2
-    rows hrows fs hfs_len hfs
-
-theorem haglund_zhang_s_inversion_interlacing_backend_weak
-    (hentry : HZEntryHas2x2Statement)
-    {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : HZData rows)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeq0Nonneg fs)
-    (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits)) :
-    IsInterlacingSeq0Nonneg (matPolyAction (hzMatrix q rows) fs) ∧
-      ∀ f ∈ matPolyAction (hzMatrix q rows) fs,
-        f ≠ 0 → (f ≠ 0 ∧ f.Splits) :=
-  thresholdMatrix_preserves_interlacing_seq0_of_entry_weak rows
-    hrows.alpha_nonneg (hrows.entry_has2x2 hentry) fs hfs_len hfs hfs_real
+  thresholdMatrix_preserves_interlacing_seq0_of_entry rows
+    hrows.alpha_nonneg hrows.entry_has2x2 fs hfs_len hfs
 
 theorem haglund_zhang_s_inversion_interlacing_weak
     {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : HZData rows)
@@ -912,22 +890,8 @@ theorem haglund_zhang_s_inversion_interlacing_weak
     IsInterlacingSeq0Nonneg (matPolyAction (hzMatrix q rows) fs) ∧
       ∀ f ∈ matPolyAction (hzMatrix q rows) fs,
         f ≠ 0 → (f ≠ 0 ∧ f.Splits) :=
-  haglund_zhang_s_inversion_interlacing_backend_weak hzEntry_has2x2
-    rows hrows fs hfs_len hfs hfs_real
-
-theorem haglund_zhang_s_inversion_sum_realRooted_backend
-    (hentry : HZEntryHas2x2Statement)
-    {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : HZData rows)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeq0Nonneg fs)
-    (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits))
-    (hsum_ne : (matPolyAction (hzMatrix q rows) fs).sum ≠ 0) :
-    (matPolyAction (hzMatrix q rows) fs).sum ≠ 0 ∧
-      ((matPolyAction (hzMatrix q rows) fs).sum).Splits := by
-  have hout :=
-    haglund_zhang_s_inversion_interlacing_backend_weak hentry
-      rows hrows fs hfs_len hfs hfs_real
-  exact isRealRooted_sum_of_isInterlacingSeq0Nonneg hout.1 hout.2 hsum_ne
+  thresholdMatrix_preserves_interlacing_seq0_of_entry_weak rows
+    hrows.alpha_nonneg hrows.entry_has2x2 fs hfs_len hfs hfs_real
 
 theorem haglund_zhang_s_inversion_sum_realRooted
     {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : HZData rows)
@@ -936,31 +900,22 @@ theorem haglund_zhang_s_inversion_sum_realRooted
     (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits))
     (hsum_ne : (matPolyAction (hzMatrix q rows) fs).sum ≠ 0) :
     (matPolyAction (hzMatrix q rows) fs).sum ≠ 0 ∧
-      ((matPolyAction (hzMatrix q rows) fs).sum).Splits :=
-  haglund_zhang_s_inversion_sum_realRooted_backend hzEntry_has2x2
-    rows hrows fs hfs_len hfs hfs_real hsum_ne
-
-theorem haglund_zhang_terminal_polynomial_realRooted_backend
-    (hentry : HZEntryHas2x2Statement)
-    {q : ℕ} (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeq0Nonneg fs)
-    (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits))
-    (hterminal_ne : hzTerminalPolynomial q fs ≠ 0) :
-    hzTerminalPolynomial q fs ≠ 0 ∧ (hzTerminalPolynomial q fs).Splits := by
+      ((matPolyAction (hzMatrix q rows) fs).sum).Splits := by
   have hout :=
-    haglund_zhang_s_inversion_interlacing_backend_weak hentry
-      hzTerminalRows hzTerminalRows_data fs hfs_len hfs hfs_real
-  exact hout.2 (hzTerminalPolynomial q fs)
-    (hzTerminalPolynomial_mem_matPolyAction q fs) hterminal_ne
+    haglund_zhang_s_inversion_interlacing_weak rows hrows fs hfs_len hfs hfs_real
+  exact isRealRooted_sum_of_isInterlacingSeq0Nonneg hout.1 hout.2 hsum_ne
 
 theorem haglund_zhang_terminal_polynomial_realRooted
     {q : ℕ} (fs : List ℝ[X]) (hfs_len : fs.length = q)
     (hfs : IsInterlacingSeq0Nonneg fs)
     (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits))
     (hterminal_ne : hzTerminalPolynomial q fs ≠ 0) :
-    hzTerminalPolynomial q fs ≠ 0 ∧ (hzTerminalPolynomial q fs).Splits :=
-  haglund_zhang_terminal_polynomial_realRooted_backend hzEntry_has2x2
-    fs hfs_len hfs hfs_real hterminal_ne
+    hzTerminalPolynomial q fs ≠ 0 ∧ (hzTerminalPolynomial q fs).Splits := by
+  have hout :=
+    haglund_zhang_s_inversion_interlacing_weak
+      hzTerminalRows hzTerminalRows_data fs hfs_len hfs hfs_real
+  exact hout.2 (hzTerminalPolynomial q fs)
+    (hzTerminalPolynomial_mem_matPolyAction q fs) hterminal_ne
 
 theorem haglund_zhang_terminal_polynomial_realRooted_of_interlacing
     {q : ℕ} (fs : List ℝ[X]) (hfs_len : fs.length = q)
@@ -972,17 +927,6 @@ theorem haglund_zhang_terminal_polynomial_realRooted_of_interlacing
     fs hfs_len hfs_weak.1 hfs_weak.2 hterminal_ne
 
 /-- Binomial Eulerian specialization: all diagonal markers are `1 + X`. -/
-theorem haglund_zhang_binomial_eulerian_backend
-    (hentry : HZEntryHas2x2Statement)
-    {q : ℕ} (ts : List ℕ)
-    (hmono : ∀ i j : Fin ts.length, i ≤ j → ts.get i ≤ ts.get j)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeqNonneg fs) :
-    IsInterlacingSeq0Nonneg
-      (matPolyAction (hzBinomialMatrix q ts) fs) :=
-  haglund_zhang_s_inversion_interlacing_backend hentry _
-    (hzBinomialRows_data hmono) fs hfs_len hfs
-
 theorem haglund_zhang_binomial_eulerian
     {q : ℕ} (ts : List ℕ)
     (hmono : ∀ i j : Fin ts.length, i ≤ j → ts.get i ≤ ts.get j)
@@ -990,8 +934,8 @@ theorem haglund_zhang_binomial_eulerian
     (hfs : IsInterlacingSeqNonneg fs) :
     IsInterlacingSeq0Nonneg
       (matPolyAction (hzBinomialMatrix q ts) fs) :=
-  haglund_zhang_binomial_eulerian_backend hzEntry_has2x2
-    ts hmono fs hfs_len hfs
+  haglund_zhang_s_inversion_interlacing
+    (hzBinomialRows ts) (hzBinomialRows_data hmono) fs hfs_len hfs
 
 theorem haglund_zhang_binomial_eulerian_range
     {q n : ℕ} (fs : List ℝ[X]) (hfs_len : fs.length = q)
@@ -1000,20 +944,6 @@ theorem haglund_zhang_binomial_eulerian_range
       (matPolyAction (hzBinomialMatrix q (hzBinomialThresholds n)) fs) :=
   haglund_zhang_binomial_eulerian
     (hzBinomialThresholds n) (hzBinomialThresholds_mono n) fs hfs_len hfs
-
-theorem haglund_zhang_binomial_eulerian_backend_weak
-    (hentry : HZEntryHas2x2Statement)
-    {q : ℕ} (ts : List ℕ)
-    (hmono : ∀ i j : Fin ts.length, i ≤ j → ts.get i ≤ ts.get j)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeq0Nonneg fs)
-    (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits)) :
-    IsInterlacingSeq0Nonneg
-      (matPolyAction (hzBinomialMatrix q ts) fs) ∧
-      ∀ f ∈ matPolyAction (hzBinomialMatrix q ts) fs,
-        f ≠ 0 → (f ≠ 0 ∧ f.Splits) :=
-  haglund_zhang_s_inversion_interlacing_backend_weak hentry
-    _ (hzBinomialRows_data hmono) fs hfs_len hfs hfs_real
 
 theorem haglund_zhang_binomial_eulerian_weak
     {q : ℕ} (ts : List ℕ)
@@ -1025,8 +955,8 @@ theorem haglund_zhang_binomial_eulerian_weak
       (matPolyAction (hzBinomialMatrix q ts) fs) ∧
       ∀ f ∈ matPolyAction (hzBinomialMatrix q ts) fs,
         f ≠ 0 → (f ≠ 0 ∧ f.Splits) :=
-  haglund_zhang_binomial_eulerian_backend_weak hzEntry_has2x2
-    ts hmono fs hfs_len hfs hfs_real
+  haglund_zhang_s_inversion_interlacing_weak
+    (hzBinomialRows ts) (hzBinomialRows_data hmono) fs hfs_len hfs hfs_real
 
 theorem haglund_zhang_binomial_eulerian_range_weak
     {q n : ℕ} (fs : List ℝ[X]) (hfs_len : fs.length = q)
@@ -1040,8 +970,7 @@ theorem haglund_zhang_binomial_eulerian_range_weak
     (hzBinomialThresholds n) (hzBinomialThresholds_mono n)
     fs hfs_len hfs hfs_real
 
-theorem haglund_zhang_binomial_eulerian_sum_realRooted_backend
-    (hentry : HZEntryHas2x2Statement)
+theorem haglund_zhang_binomial_eulerian_sum_realRooted
     {q : ℕ} (ts : List ℕ)
     (hmono : ∀ i j : Fin ts.length, i ≤ j → ts.get i ≤ ts.get j)
     (fs : List ℝ[X]) (hfs_len : fs.length = q)
@@ -1052,22 +981,8 @@ theorem haglund_zhang_binomial_eulerian_sum_realRooted_backend
     (matPolyAction (hzBinomialMatrix q ts) fs).sum ≠ 0 ∧
       ((matPolyAction (hzBinomialMatrix q ts) fs).sum).Splits := by
   have hout :=
-    haglund_zhang_binomial_eulerian_backend_weak hentry
-      ts hmono fs hfs_len hfs hfs_real
+    haglund_zhang_binomial_eulerian_weak ts hmono fs hfs_len hfs hfs_real
   exact isRealRooted_sum_of_isInterlacingSeq0Nonneg hout.1 hout.2 hsum_ne
-
-theorem haglund_zhang_binomial_eulerian_sum_realRooted
-    {q : ℕ} (ts : List ℕ)
-    (hmono : ∀ i j : Fin ts.length, i ≤ j → ts.get i ≤ ts.get j)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeq0Nonneg fs)
-    (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits))
-    (hsum_ne :
-      (matPolyAction (hzBinomialMatrix q ts) fs).sum ≠ 0) :
-    (matPolyAction (hzBinomialMatrix q ts) fs).sum ≠ 0 ∧
-      ((matPolyAction (hzBinomialMatrix q ts) fs).sum).Splits :=
-  haglund_zhang_binomial_eulerian_sum_realRooted_backend hzEntry_has2x2
-    ts hmono fs hfs_len hfs hfs_real hsum_ne
 
 theorem haglund_zhang_binomial_eulerian_range_sum_realRooted
     {q n : ℕ} (fs : List ℝ[X]) (hfs_len : fs.length = q)
@@ -1716,7 +1631,7 @@ theorem gsEntry_has2x2 : GSEntryHas2x2Statement := by
   exact (gsEntry_shape hα₁ hα₂ ht hj hcompat).has2x2
 
 lemma GSData.entry_has2x2 {q : ℕ} {rows : List (ℕ × ℝ[X])}
-    (hrows : GSData rows) (hentry : GSEntryHas2x2Statement) :
+    (hrows : GSData rows) :
     ∀ (i₁ i₂ : Fin rows.length) (j₁ j₂ : Fin q),
       i₁ ≤ i₂ → j₁ ≤ j₂ →
       Has2x2InterlacingProperty0
@@ -1725,43 +1640,20 @@ lemma GSData.entry_has2x2 {q : ℕ} {rows : List (ℕ × ℝ[X])}
         (thresholdEntry (rows.get i₂).1 (rows.get i₂).2 j₁.1)
         (thresholdEntry (rows.get i₂).1 (rows.get i₂).2 j₂.1) := by
   intro i₁ i₂ j₁ j₂ hi hj
-  exact hentry
+  exact gsEntry_has2x2
     (hrows.alpha_mem (rows.get i₁) (List.get_mem rows i₁))
     (hrows.alpha_mem (rows.get i₂) (List.get_mem rows i₂))
     (hrows.thresh_mono i₁ i₂ hi)
     hj
     (hrows.compat i₁ i₂ hi)
 
-/-- Gustafsson--Solus threshold-recursion backend, reduced to the finite
-entrywise `2 x 2` threshold check. -/
-theorem gustafsson_solus_interlacing_recursion_backend
-    (hentry : GSEntryHas2x2Statement)
-    {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : GSData rows)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeqNonneg fs) :
-    IsInterlacingSeq0Nonneg (matPolyAction (thresholdMatrix q rows) fs) :=
-  thresholdMatrix_preserves_interlacing_seq0_of_entry rows
-    hrows.alpha_nonneg (hrows.entry_has2x2 hentry) fs hfs_len hfs
-
 theorem gustafsson_solus_interlacing_recursion
     {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : GSData rows)
     (fs : List ℝ[X]) (hfs_len : fs.length = q)
     (hfs : IsInterlacingSeqNonneg fs) :
     IsInterlacingSeq0Nonneg (matPolyAction (thresholdMatrix q rows) fs) :=
-  gustafsson_solus_interlacing_recursion_backend gsEntry_has2x2
-    rows hrows fs hfs_len hfs
-
-theorem gustafsson_solus_interlacing_recursion_backend_weak
-    (hentry : GSEntryHas2x2Statement)
-    {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : GSData rows)
-    (fs : List ℝ[X]) (hfs_len : fs.length = q)
-    (hfs : IsInterlacingSeq0Nonneg fs)
-    (hfs_real : ∀ f ∈ fs, f ≠ 0 → (f ≠ 0 ∧ f.Splits)) :
-    IsInterlacingSeq0Nonneg (matPolyAction (thresholdMatrix q rows) fs) ∧
-      ∀ f ∈ matPolyAction (thresholdMatrix q rows) fs,
-        f ≠ 0 → (f ≠ 0 ∧ f.Splits) :=
-  thresholdMatrix_preserves_interlacing_seq0_of_entry_weak rows
-    hrows.alpha_nonneg (hrows.entry_has2x2 hentry) fs hfs_len hfs hfs_real
+  thresholdMatrix_preserves_interlacing_seq0_of_entry rows
+    hrows.alpha_nonneg hrows.entry_has2x2 fs hfs_len hfs
 
 theorem gustafsson_solus_interlacing_recursion_weak
     {q : ℕ} (rows : List (ℕ × ℝ[X])) (hrows : GSData rows)
@@ -1771,8 +1663,8 @@ theorem gustafsson_solus_interlacing_recursion_weak
     IsInterlacingSeq0Nonneg (matPolyAction (thresholdMatrix q rows) fs) ∧
       ∀ f ∈ matPolyAction (thresholdMatrix q rows) fs,
         f ≠ 0 → (f ≠ 0 ∧ f.Splits) :=
-  gustafsson_solus_interlacing_recursion_backend_weak gsEntry_has2x2
-    rows hrows fs hfs_len hfs hfs_real
+  thresholdMatrix_preserves_interlacing_seq0_of_entry_weak rows
+    hrows.alpha_nonneg hrows.entry_has2x2 fs hfs_len hfs hfs_real
 
 theorem gustafsson_solus_interlacing_recursion_choices
     {q : ℕ} (choices : List (ℕ × Bool))

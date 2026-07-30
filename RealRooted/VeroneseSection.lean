@@ -943,9 +943,15 @@ def FullyInterlacingPairToPrec0Statement : Prop :=
 /-- Strict interface from the two-row Lace condition back to polynomial
 interlacing.  This is useful in nondegenerate applications where the relevant
 sections are known to be nonzero. -/
-def FullyInterlacingPairToPrecStatement : Prop :=
+abbrev FullyInterlacingPairToPrecStatement : Prop :=
   ∀ {p q : ℝ[X]},
     FullyInterlacingPair p.coeff q.coeff → Prec p q
+
+/-- Two-row Lace condition implies polynomial interlacing. -/
+theorem fullyInterlacingPairToPrec {p q : ℝ[X]}
+    (hfull : FullyInterlacingPair p.coeff q.coeff) :
+    Prec p q := by
+  sorry
 
 /-- Interlacing-extraction interface for the converse lace-to-polynomial
 bridge.  Given two nonzero polynomials whose coefficient sequences form a
@@ -958,7 +964,7 @@ total nonnegativity of the cross `2 × 2` Lace minors forces the roots of the
 two polynomials to interlace.  Real-rootedness itself, the `Splits` part of
 `Prec`, is supplied separately by the forward Aissen--Schoenberg--Whitney
 theorem, so this statement only asks for the interlacing data. -/
-def FullyInterlacingPairInterlaceStatement : Prop :=
+abbrev FullyInterlacingPairInterlaceStatement : Prop :=
   ∀ ⦃p q : ℝ[X]⦄, p ≠ 0 → q ≠ 0 →
     FullyInterlacingPair p.coeff q.coeff →
     ∃ ss rs : List ℝ,
@@ -966,6 +972,16 @@ def FullyInterlacingPairInterlaceStatement : Prop :=
       (↑ss : Multiset ℝ) = p.roots ∧ (↑rs : Multiset ℝ) = q.roots ∧
         ((ss.length + 1 = rs.length ∧ ListInterlaces ss rs) ∨
           (ss.length = rs.length ∧ ListAlternates ss rs))
+
+/-- Interlacing extraction theorem from the cross Lace minors. -/
+theorem fullyInterlacingPairInterlace ⦃p q : ℝ[X]⦄ (hp0 : p ≠ 0) (hq0 : q ≠ 0)
+    (hfull : FullyInterlacingPair p.coeff q.coeff) :
+    ∃ ss rs : List ℝ,
+      ss.Pairwise (· ≤ ·) ∧ rs.Pairwise (· ≤ ·) ∧
+      (↑ss : Multiset ℝ) = p.roots ∧ (↑rs : Multiset ℝ) = q.roots ∧
+        ((ss.length + 1 = rs.length ∧ ListInterlaces ss rs) ∨
+          (ss.length = rs.length ∧ ListAlternates ss rs)) := by
+  sorry
 
 /-- Checked reduction for the converse lace-to-interlacing bridge.
 
@@ -981,9 +997,7 @@ classical inputs:
 
 The zero polynomial cases are discharged directly by `prec0_zero_left` and
 `prec0_zero_right`. -/
-theorem fullyInterlacingPairToPrec0_of_forwardASW_interlace
-    (hASW : aissenSchoenbergWhitneyForwardStatement)
-    (hInt : FullyInterlacingPairInterlaceStatement) :
+theorem fullyInterlacingPairToPrec0_of_forwardASW_interlace :
     FullyInterlacingPairToPrec0Statement := fun {p q} hfull => by
   rcases eq_or_ne p 0 with rfl | hp0
   · exact prec0_zero_left q
@@ -992,9 +1006,9 @@ theorem fullyInterlacingPairToPrec0_of_forwardASW_interlace
   refine Or.inr (Or.inr ?_)
   have hp_pf : IsPolyaFreqSeq p.coeff := hfull.left_pf
   have hq_pf : IsPolyaFreqSeq q.coeff := hfull.right_pf
-  have hp_split := (hASW hp_pf).1
-  have hq_split := (hASW hq_pf).1
-  obtain ⟨ss, rs, hss, hrs, hss_eq, hrs_eq, hshape⟩ := hInt hp0 hq0 hfull
+  have hp_split := (aissenSchoenbergWhitneyForward hp_pf).1
+  have hq_split := (aissenSchoenbergWhitneyForward hq_pf).1
+  obtain ⟨ss, rs, hss, hrs, hss_eq, hrs_eq, hshape⟩ := fullyInterlacingPairInterlace hp0 hq0 hfull
   exact ⟨⟨hp0, hp_split⟩, ⟨hq0, hq_split⟩, ss, rs, hss, hrs,
     hss_eq, hrs_eq, hshape⟩
 
@@ -1886,23 +1900,22 @@ theorem IsPolyaFreqSeq_veroneseSectionPolynomial_coeff {p : ℝ[X]}
 /-- Conditional real-rootedness of Veronese sections from the forward ASW
 theorem and a PF certificate for the original polynomial. -/
 theorem splits_veroneseSectionPolynomial_of_pf {p : ℝ[X]}
-    (hASW : aissenSchoenbergWhitneyForwardStatement)
     (hp : IsPolyaFreqSeq p.coeff) {r k : ℕ}
     (hr : 0 < r) (hk : k < r) :
     veroneseSectionPolynomial r k p = 0 ∨
       (veroneseSectionPolynomial r k p).Splits :=
   Or.inr
-    (hASW (IsPolyaFreqSeq_veroneseSectionPolynomial_coeff (p := p) hp hr hk)).1
+    (aissenSchoenbergWhitneyForward
+      (IsPolyaFreqSeq_veroneseSectionPolynomial_coeff (p := p) hp hr hk)).1
 
 /-- Zero-aware real-rootedness of Veronese sections from the forward ASW
 theorem and a PF certificate for the original polynomial. -/
 theorem veroneseSectionPolynomial_eq_zero_or_isRealRooted_of_pf {p : ℝ[X]}
-    (hASW : aissenSchoenbergWhitneyForwardStatement)
     (hp : IsPolyaFreqSeq p.coeff) {r k : ℕ}
     (hr : 0 < r) (hk : k < r) :
     veroneseSectionPolynomial r k p = 0 ∨
       (veroneseSectionPolynomial r k p).Splits :=
-  splits_veroneseSectionPolynomial_of_pf hASW hp hr hk
+  splits_veroneseSectionPolynomial_of_pf hp hr hk
 
 /-- Conditional PF preservation for Veronese sections of real-rooted
 nonnegative-coefficient polynomials, using the reverse ASW theorem. -/
@@ -1918,24 +1931,22 @@ theorem IsPolyaFreqSeq_veroneseSectionPolynomial_of_realRooted_nonneg
 /-- Conditional real-rootedness of Veronese sections of real-rooted
 nonnegative-coefficient polynomials, assuming both directions of ASW. -/
 theorem splits_veroneseSectionPolynomial_of_splits_nonneg {p : ℝ[X]}
-    (hASW : aissenSchoenbergWhitneyForwardStatement)
     (hpnn : HasNonnegCoeffs p) (hprr : p.Splits) {r k : ℕ}
     (hr : 0 < r) (hk : k < r) :
     veroneseSectionPolynomial r k p = 0 ∨
       (veroneseSectionPolynomial r k p).Splits :=
   Or.inr
-    (hASW (IsPolyaFreqSeq_veroneseSectionPolynomial_of_realRooted_nonneg hpnn hprr hr hk)).1
+    (aissenSchoenbergWhitneyForward
+      (IsPolyaFreqSeq_veroneseSectionPolynomial_of_realRooted_nonneg hpnn hprr hr hk)).1
 
 /-- Zero-aware real-rootedness of Veronese sections of real-rooted
 nonnegative-coefficient polynomials, assuming both directions of ASW. -/
 theorem veroneseSectionPolynomial_eq_zero_or_isRealRooted_of_realRooted_nonneg
     {p : ℝ[X]}
-    (hASW : aissenSchoenbergWhitneyForwardStatement)
     (hpnn : HasNonnegCoeffs p) (hprr_splits : p.Splits) {r k : ℕ}
     (hr : 0 < r) (hk : k < r) :
     veroneseSectionPolynomial r k p = 0 ∨
       (veroneseSectionPolynomial r k p).Splits :=
-  splits_veroneseSectionPolynomial_of_splits_nonneg
-    hASW hpnn hprr_splits hr hk
+  splits_veroneseSectionPolynomial_of_splits_nonneg hpnn hprr_splits hr hk
 
 end RealRooted

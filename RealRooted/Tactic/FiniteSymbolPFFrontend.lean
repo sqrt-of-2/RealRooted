@@ -14,7 +14,6 @@ namespace Tactic
 
 syntax (name := rr_fsp_finite_symbol_backend_named)
   "rr_fsp_finite_symbol_backend" " using "
-    "bb_backend" ":=" term ","
     "stable" ":=" term ","
     "alpha_nonneg" ":=" term ","
     "beta_nonneg" ":=" term :
@@ -22,31 +21,22 @@ syntax (name := rr_fsp_finite_symbol_backend_named)
 
 syntax (name := rr_fsp_stable_of_residual_factor_named)
   "rr_fsp_stable_of_residual_factor" " using "
-    "mul_stable" ":=" term ","
     "factor" ":=" term ","
     "residual_stable" ":=" term :
   tactic
 
 syntax (name := rr_fsp_stable_of_residual_certificate_named)
   "rr_fsp_stable_of_residual_certificate" " using "
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "certificate" ":=" term :
   tactic
 
 syntax (name := rr_fsp_preserver_of_residual_certificate_named)
   "rr_fsp_preserver_of_residual_certificate" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "certificate" ":=" term :
   tactic
 
 syntax (name := rr_fsp_quadratic_preserver_named)
   "rr_fsp_quadratic_preserver" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "degree_ge_two" ":=" term ","
     "cubic_degree" ":=" term ","
     "residual_pf" ":=" term ","
@@ -56,9 +46,6 @@ syntax (name := rr_fsp_quadratic_preserver_named)
 
 syntax (name := rr_fsp_quadratic_preserver_on_degree_named)
   "rr_fsp_quadratic_preserver_on_degree" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "degree_ge_two" ":=" term ","
     "cubic_degree" ":=" term ","
     "residual_pf" ":=" term ","
@@ -68,9 +55,6 @@ syntax (name := rr_fsp_quadratic_preserver_on_degree_named)
 
 syntax (name := rr_fsp_second_derivative_preserver_named)
   "rr_fsp_second_derivative_preserver" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "degree_ge_two" ":=" term ","
     "cubic_degree" ":=" term ","
     "residual_pf" ":=" term ","
@@ -80,9 +64,6 @@ syntax (name := rr_fsp_second_derivative_preserver_named)
 
 syntax (name := rr_fsp_second_derivative_preserver_on_degree_named)
   "rr_fsp_second_derivative_preserver_on_degree" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "degree_ge_two" ":=" term ","
     "cubic_degree" ":=" term ","
     "residual_pf" ":=" term ","
@@ -92,9 +73,6 @@ syntax (name := rr_fsp_second_derivative_preserver_on_degree_named)
 
 syntax (name := rr_fsp_shifted_second_derivative_preserver_named)
   "rr_fsp_shifted_second_derivative_preserver" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     "degree_ge_two" ":=" term ","
     "cubic_degree" ":=" term ","
     "residual_pf" ":=" term ","
@@ -104,9 +82,6 @@ syntax (name := rr_fsp_shifted_second_derivative_preserver_named)
 
 syntax (name := rr_fsp_second_derivative_sequence_named)
   "rr_fsp_second_derivative_sequence" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     ("cutoff" ":=" term ",")?
     "base" ":=" term ","
     "degree" ":=" term ","
@@ -121,9 +96,6 @@ syntax (name := rr_fsp_second_derivative_sequence_named)
 
 syntax (name := rr_fsp_shifted_second_derivative_sequence_named)
   "rr_fsp_shifted_second_derivative_sequence" " using "
-    "bb_backend" ":=" term ","
-    "homogenize_stable" ":=" term ","
-    "mul_stable" ":=" term ","
     ("cutoff" ":=" term ",")?
     "base" ":=" term ","
     "degree" ":=" term ","
@@ -139,45 +111,35 @@ syntax (name := rr_fsp_shifted_second_derivative_sequence_named)
 macro_rules
   | `(tactic|
       rr_fsp_finite_symbol_backend using
-        bb_backend := $hBB:term,
         stable := $hstab:term,
         alpha_nonneg := $halpha:term,
         beta_nonneg := $hbeta:term) =>
       `(tactic|
         exact FiniteSymbolPF.finite_symbol_pf_bidiagonal_backend
-          $hBB $hstab $halpha $hbeta)
+          $hstab $halpha $hbeta)
   | `(tactic|
       rr_fsp_stable_of_residual_factor using
-        mul_stable := $hmul:term,
         factor := $hfac:term,
         residual_stable := $hres:term) =>
       `(tactic|
         exact FiniteSymbolPF.finiteSymbol_stable_of_residual_factor
-          $hmul $hfac $hres)
+          $hfac $hres)
   | `(tactic|
       rr_fsp_stable_of_residual_certificate using
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         certificate := $hcert:term) =>
       `(tactic|
         exact
           FiniteSymbolPF.finiteSymbol_stable_of_residual_certificate
-            $hhom $hmul $hcert)
+            $hcert)
   | `(tactic|
       rr_fsp_preserver_of_residual_certificate using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         certificate := $hcert:term) =>
       `(tactic|
         exact
           FiniteSymbolPF.bidiagonalPFPreserver_of_finiteSymbol_residual_certificate
-            $hBB $hhom $hmul $hcert)
+            $hcert)
   | `(tactic|
       rr_fsp_quadratic_preserver using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         degree_ge_two := $hd:term,
         cubic_degree := $hdeg:term,
         residual_pf := $hpf:term,
@@ -186,12 +148,9 @@ macro_rules
       `(tactic|
         exact
           FiniteSymbolPF.quadraticBidiagonalPFPreserver_of_residual_certificate
-            $hBB $hhom $hmul _ _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
+            _ _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
   | `(tactic|
       rr_fsp_quadratic_preserver_on_degree using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         degree_ge_two := $hd:term,
         cubic_degree := $hdeg:term,
         residual_pf := $hpf:term,
@@ -200,12 +159,9 @@ macro_rules
       `(tactic|
         exact
           FiniteSymbolPF.quadraticBidiagonalPFPreserver_of_residual_certificate_on_degree
-            $hBB $hhom $hmul _ _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
+            _ _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
   | `(tactic|
       rr_fsp_second_derivative_preserver using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         degree_ge_two := $hd:term,
         cubic_degree := $hdeg:term,
         residual_pf := $hpf:term,
@@ -214,12 +170,9 @@ macro_rules
       `(tactic|
         exact
           FiniteSymbolPF.secondDerivativeBidiagonalPFPreserver_of_residual_certificate
-            $hBB $hhom $hmul _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
+            _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
   | `(tactic|
       rr_fsp_second_derivative_preserver_on_degree using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         degree_ge_two := $hd:term,
         cubic_degree := $hdeg:term,
         residual_pf := $hpf:term,
@@ -228,12 +181,9 @@ macro_rules
       `(tactic|
         exact
           FiniteSymbolPF.secondDerivativeBidiagonalPFPreserver_of_residual_certificate_on_degree
-            $hBB $hhom $hmul _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
+            _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
   | `(tactic|
       rr_fsp_shifted_second_derivative_preserver using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         degree_ge_two := $hd:term,
         cubic_degree := $hdeg:term,
         residual_pf := $hpf:term,
@@ -242,12 +192,9 @@ macro_rules
       `(tactic|
         exact
           FiniteSymbolPF.shiftedSecondDerivativeBidiagonalPFPreserver_of_residual_certificate
-            $hBB $hhom $hmul _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
+            _ _ _ _ _ $hd $hdeg $hpf $halpha $hbeta)
   | `(tactic|
       rr_fsp_second_derivative_sequence using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         base := $hbase:term,
         degree := $hdegree:term,
         degree_ge_two := $hd:term,
@@ -260,13 +207,10 @@ macro_rules
       `(tactic|
         rr_exact_pf_sequence
           (FiniteSymbolPF.isPFPolynomial_of_secondDerivativeBidiagonalForm_sequence
-            $hBB $hhom $hmul $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
+            $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
           $[, nonzero := $hne]?)
   | `(tactic|
       rr_fsp_second_derivative_sequence using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         cutoff := $N:term,
         base := $hbase:term,
         degree := $hdegree:term,
@@ -280,13 +224,10 @@ macro_rules
       `(tactic|
         rr_exact_pf_sequence
           (FiniteSymbolPF.isPFPolynomial_of_secondDerivativeBidiagonalForm_sequence_from
-            $hBB $hhom $hmul $N $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
+            $N $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
           $[, nonzero := $hne]?)
   | `(tactic|
       rr_fsp_shifted_second_derivative_sequence using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         base := $hbase:term,
         degree := $hdegree:term,
         degree_ge_two := $hd:term,
@@ -299,13 +240,10 @@ macro_rules
       `(tactic|
         rr_exact_pf_sequence
           (FiniteSymbolPF.isPFPolynomial_of_shiftedSecondDerivativeBidiagonalForm_sequence
-            $hBB $hhom $hmul $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
+            $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
           $[, nonzero := $hne]?)
   | `(tactic|
       rr_fsp_shifted_second_derivative_sequence using
-        bb_backend := $hBB:term,
-        homogenize_stable := $hhom:term,
-        mul_stable := $hmul:term,
         cutoff := $N:term,
         base := $hbase:term,
         degree := $hdegree:term,
@@ -319,7 +257,7 @@ macro_rules
       `(tactic|
         rr_exact_pf_sequence
           (FiniteSymbolPF.isPFPolynomial_of_shiftedSecondDerivativeBidiagonalForm_sequence_from
-            $hBB $hhom $hmul $N $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
+            $N $hbase $hdegree $hd $hdeg $hpf $halpha $hbeta $hrec)
           $[, nonzero := $hne]?)
 
 end Tactic

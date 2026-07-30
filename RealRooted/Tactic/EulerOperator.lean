@@ -15,15 +15,14 @@ namespace RealRooted
 theorem isPFPolynomial_iterateThetaPlusOne
     (l : ℕ) {p : ℝ[X]} (hp : IsPFPolynomial p) :
     IsPFPolynomial (iterateThetaPlusOne l p) :=
-  iterateThetaPlusOne_preserves_pf thetaPlusOne_preserves_pf l hp
+  iterateThetaPlusOne_preserves_pf l hp
 
 /-- Default proved `Prec0` preservation for the `l`-fold iterate of `theta + 1`. -/
 theorem prec0_iterateThetaPlusOne
     (l : ℕ) {p q : ℝ[X]}
     (hp : IsPFPolynomial p) (hq : IsPFPolynomial q) (hpq : Prec0 p q) :
     Prec0 (iterateThetaPlusOne l p) (iterateThetaPlusOne l q) :=
-  iterateThetaPlusOne_preserves_prec0
-    thetaPlusOne_preserves_pf thetaPlusOnePreservesPrec0 l hp hq hpq
+  iterateThetaPlusOne_preserves_prec0 l hp hq hpq
 
 namespace Tactic
 
