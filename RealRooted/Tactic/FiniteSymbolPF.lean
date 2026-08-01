@@ -372,7 +372,8 @@ theorem bivariateStableMulXAddYPow :
       IsBivariateUpperStable P →
       IsBivariateUpperStable
         (((MvPolynomial.X 0 + MvPolynomial.X 1) ^ m) * P) := by
-  sorry
+  intro m P hP
+  exact hP.mul_X_add_X_pow 0 1 m
 
 /-! ## Residual certificates and assembly -/
 
