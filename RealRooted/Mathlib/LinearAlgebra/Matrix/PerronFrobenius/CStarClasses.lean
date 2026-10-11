@@ -199,7 +199,7 @@ lemma each_term_is_nonneg_real_multiple_of_sum_of_triangle_eq {u : ℂ}
     exact eq_coe_re_of_mul_eq_norm_mul (aligned i hi)
   calc
     v i = (v i * star u) * u / (u * star u) := by rw [mul_assoc, mul_comm (star u), mul_div_cancel_right₀ _ (
-      (CStarRing.mul_star_self_ne_zero_iff u).mpr h_ne)]
+      mul_star_self_ne_zero.mpr h_ne)]
     _ = (‖v i‖ * ‖u‖ : ℂ) * u / (‖u‖ ^ 2 : ℂ) := by rw [h, star_mul_self, ofReal_pow]
     _ = (k : ℂ) * u := by
       rw [ofReal_div, ← ofReal_mul]

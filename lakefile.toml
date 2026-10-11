@@ -12,14 +12,14 @@ weak.linter.style.header = false
 maxSynthPendingDepth = 3
 
 [[require]]
-name = "mathlib"
-git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.34.0"
-
-[[require]]
 name = "LeanLGV"
 git = "https://github.com/PerAlexandersson/LeanLGV.git"
 rev = "acf9f6694c1169e9773aaf9d1d594709c0926eb8"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.35.0-rc4"
 
 [[lean_lib]]
 name = "RealRooted"

@@ -239,6 +239,8 @@ coefficient of the original polynomial, for degree `n ≥ 2`. -/
 lemma nextCoeff_derivative_of_two_le_natDegree (p : R[X])
     (htwo : 2 ≤ p.natDegree) :
     p.derivative.nextCoeff = (p.natDegree - 1 : R) * p.nextCoeff := by
+  have : HasUniqueDiv R :=
+    ⟨fun _ hn _ _ h ↦ eq_of_nsmul_eq_nsmul_of_addCommute hn (.all _ _) h⟩
   have hpder_deg : p.derivative.natDegree = p.natDegree - 1 :=
     p.natDegree_derivative
   rw [Polynomial.nextCoeff_of_natDegree_pos, hpder_deg]
